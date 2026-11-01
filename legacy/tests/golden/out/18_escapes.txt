@@ -1,0 +1,5 @@
+255101518
+15000.021
+[con 
+ salto y 	 tabulador][barra \ y comilla " dentro][llaves {y} literales][y 255 sale en medio]
+4

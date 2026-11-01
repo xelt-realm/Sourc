@@ -1,0 +1,23 @@
+' IF en sus tres formas, WHILE y FOR, sin operadores binarios.
+' La precedencia es 2b: un caso de 2a que use `a + b` estaría juzgando dos
+' cosas a la vez.
+Dim i As Integer = 0
+Dim dos As Boolean = TRUE
+Dim mas As Boolean = FALSE
+IF dos THEN PRINT "a"
+IF dos THEN
+  PRINT "b"
+ELSE IF mas THEN
+  PRINT "c"
+ELSE
+  PRINT "d"
+END IF
+WHILE mas
+  i = 12
+WEND
+FOR i = 0 TO 2
+  PRINT i
+NEXT i
+FOR i = 2 TO 0 STEP 1
+  PRINT i
+NEXT i

@@ -1,0 +1,20 @@
+' Recursión y llamadas entre funciones.
+FUNCTION mcd(a AS INTEGER, b AS INTEGER) AS INTEGER
+    IF b = 0 THEN RETURN a
+    RETURN mcd(b, a MOD b)
+END FUNCTION
+
+FUNCTION potencia(base AS INTEGER, exp AS INTEGER) AS INTEGER
+    IF exp = 0 THEN RETURN 1
+    RETURN base * potencia(base, exp - 1)
+END FUNCTION
+
+FUNCTION serie(n AS INTEGER) AS INTEGER
+    IF n < 1 THEN RETURN 0
+    RETURN n * 10 + serie(n - 1)
+END FUNCTION
+
+PRINT mcd(1071, 462)
+PRINT potencia(2, 10)
+PRINT potencia(3, 4)
+PRINT serie(4)

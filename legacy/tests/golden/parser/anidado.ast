@@ -1,0 +1,22 @@
+   0 Program          65   384 | body=1,4,7
+   1 Dim             209   230 | name=i name_span=213-214 type_ref=2 value=3
+   2 TypeRef         218   225 | name=INTEGER element=-
+   3 IntLit          228   229 | value=0
+   4 Dim             230   256 | name=dos name_span=234-237 type_ref=5 value=6
+   5 TypeRef         241   248 | name=BOOLEAN element=-
+   6 BoolLit         251   255 | value=1
+   7 For             256   384 | var=i var_span=260-261 start=8 stop=9 step=- body=10,16
+   8 IntLit          264   265 | value=0
+   9 IntLit          269   270 | value=1
+  10 If              273   338 | condition=11 then_body=12 else_body=14 one_liner=0
+  11 Name            276   279 | value=dos
+  12 Primitive       289   304 | name=PRINT args=13 inline=0
+  13 StringLit       296   303 | value=dentro
+  14 Primitive       315   329 | name=PRINT args=15 inline=0
+  15 StringLit       322   328 | value=fuera
+  16 While           340   377 | condition=17 body=18
+  17 BoolLit         346   351 | value=0
+  18 Primitive       356   370 | name=PRINT args=19 inline=0
+  19 StringLit       363   369 | value=nunca
+
+; 20 nodo(s)

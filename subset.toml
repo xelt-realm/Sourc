@@ -1,0 +1,139 @@
+# subset.toml — el contrato del subconjunto del lenguaje.
+#
+# ADR 0015: *«Cada fase declara un subset level. El runtime sólo puede usar
+# features del nivel de la fase en curso, y un test de CI falla si usa algo
+# más.»* Y: *«La regla del subconjunto es el riesgo número uno del proyecto.»*
+#
+# ## Qué es una "feature"
+#
+# Un nombre del AST, o el nombre de una primitiva o de un tipo. No es "lo que el
+# parser acepta": `STRUCT`, `ENUM` y los arrays multidimensionales no parsean y
+# **no están** en ninguna de las dos listas, así que cuando la Fase 4 los traiga
+# aparecerán en el informe y este gate fallará hasta que alguien los admita a
+# mano. Un vocabulario construido con "las cosas que hoy compilan" se
+# autoautorizaría el día exacto en que tiene que apretar.
+#
+# ## Ampliar la lista
+#
+# Ampliar `permitido` es una decisión, no un accident: significa que el
+# compilador en Source necesita esa feature, y por tanto que la Fase 4 tiene una
+# entrega nueva justificada. La razón va en `tests/subset/`, y el motivo va aquí.
+#
+# ## El campo `coste`
+#
+# Lo que cuesta hoy trabajar sin la feature. Es lo que convierte la Fase 4 en
+# trabajo justificado en vez de feature creep: sin `campo`, un nodo del IR son
+# arrays paralelos con índices enteros, y eso es exactamente el modo de fallo
+# que AGENTS.md lista como trampa. Con el coste escrito, la decisión de Fase 4
+# se toma con el número delante.
+
+nivel = 2
+fase = 2
+
+# El mínimo que el compilador necesita. Cualquier cosa de aquí fuera necesita un
+# ADR. Los literales y los nombres **no** están: son sintaxis, no features, y el
+# extractor no los nombra.
+permitido = [
+  # datos
+  "dim", "assign", "binary", "unary",
+  # control
+  "if", "while", "for", "return", "functiondecl",
+  # expresiones
+  "index", "interpolate", "arraylit", "newarray",
+  "call:nombre",
+  # tipos
+  "tipo:integer", "tipo:double", "tipo:single", "tipo:boolean",
+  "tipo:string", "tipo:color", "tipo:array",
+  "tipo:array-de-integer", "tipo:array-de-double", "tipo:array-de-single",
+  "tipo:array-de-string",
+  # sentencia
+  "primitiva:print",
+  # funciones de texto
+  "funcion:len", "funcion:lenu", "funcion:charcode", "funcion:chr",
+  "funcion:str",
+  "funcion:val", "funcion:left", "funcion:right", "funcion:mid",
+  "funcion:concat", "funcion:compare", "funcion:contains", "funcion:indexof",
+  # funciones numéricas
+  "funcion:rgb", "funcion:abs", "funcion:min", "funcion:max",
+  "funcion:clamp", "funcion:sqrt", "funcion:floor", "funcion:sin",
+  "funcion:cos",
+]
+
+[[prohibido]]
+feature = "arena"
+motivo = "ARENA no baja a IR (E0044) y llega en la Fase 4 junto con STRUCT."
+coste = """
+    Los arrays del IR no se pueden liberar. El bump allocator del módulo
+    (`@__bump`) ya reserva sin liberar, así que un compilador que reserva por
+    programa crece con el número de programas que compila en la misma sesión.
+    Con ARENA el coste es un `RESET` por programa; sin ella, es memoria que
+    nadie devuelve.
+    """
+
+[[prohibido]]
+feature = "goto"
+motivo = "GOTO no baja a IR (E0043) y no está en el nivel 2."
+coste = """
+    Salir de un bucle es un booleano y un `IF`: un local más, una comparación
+    más y un salto más en cada vuelta. No es sólo ruido --un bucle de parsing
+    se ejecuta por cada token, así que el coste se paga millones de veces-- y
+    sobre todo es la clase de bucle en la que uno se equivoca: la bandera se
+    olvida reiniciar y el bucle termina antes de tiempo.
+    """
+
+[[prohibido]]
+feature = "gosub"
+motivo = """
+    GOSUB comparte destino con GOTO y da el mismo E0043. Se declara aparte porque
+    son dos nodos distintos y el gate de vocabulario los cuenta por separado: si
+    uno llegara al contrato sin que nadie lo decidiera, el build pararía, que es
+    lo que tiene que pasar.
+    """
+coste = "ninguno: es el mismo salto que GOTO, con una etiqueta de vuelta en vez de una de salto."
+
+[[prohibido]]
+feature = "label"
+motivo = "La etiqueta sólo sirve para el salto de arriba, y el salto está fuera."
+coste = "ninguno: si `goto` está prohibido, la etiqueta no se puede usar."
+
+[[prohibido]]
+feature = "campo"
+motivo = """
+    El acceso a campo de un struct no está implementado (E0025) y los structs
+    llegan en la Fase 4.
+    """
+coste = """
+    **El más caro de la lista.** Un nodo del IR son sus campos en arrays
+    paralelos con índices enteros, y un índice mal escrito lee el campo de otro
+    nodo sin ningún error: el tipochecker no lo ve porque un `INTEGER` es un
+    `INTEGER` sea del nodo que sea. Es exactamente el modo de fallo de la lista
+    de trampas de AGENTS.md, y el compilador en Source lo va a pagar en cada
+    campo de cada nodo, en cada acceso. `STRUCT` no es comodidad aquí: es lo
+    que separa un bug de un valor raro.
+    """
+
+[[prohibido]]
+feature = "colorstmt"
+motivo = """
+    `COLOR n` es la sentencia de paleta (ADR 0005), y es dibujo. `RGB` sí está
+    permitido porque hace falta para escribir un literal de color.
+    """
+coste = "ninguno: el compilador no dibuja y no cambia paletas."
+
+[[prohibido]]
+feature = "use:source_2d"
+motivo = """
+    `USE` trae un módulo del runtime. El compilador en Source es un solo
+    fichero (`compiler/sourcc.src`), por decisión de fase: antes de dividirlo
+    hay que poder escribirlo entero.
+    """
+coste = """
+    Un fichero de unos miles de líneas. La revisión de un cambio es el diff de
+    ese fichero entero, y las diferencias de orden de declaración se leen peor
+    cuanto más largo sea.
+    """
+
+[[prohibido]]
+feature = "import"
+motivo = "`IMPORT FROM` es la otra forma de traer código, y el mismo caso."
+coste = "el mismo que `use:source_2d`."

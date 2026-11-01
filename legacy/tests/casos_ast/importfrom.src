@@ -1,0 +1,3 @@
+' IMPORT FROM es Source-a-Source y está prohibido por contrato.
+IMPORT FROM "otro.src" AS o
+PRINT 1

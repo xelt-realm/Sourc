@@ -1,0 +1,131 @@
+   0 Program          15  1294 | body=1,2,6,19,26,33,40,43,46,49
+   1 Use             385   399 | module=SOURCE_2D
+   2 Primitive       400   429 | name=SCREEN args=3,4,5 inline=0
+   3 IntLit          407   410 | value=640
+   4 IntLit          412   415 | value=480
+   5 StringLit       418   428 | value=Laberinto
+   6 Dim             430   679 | name=mapa name_span=434-438 type_ref=7 value=9
+   7 TypeRef         442   447 | name=ARRAY element=8
+   8 TypeRef         451   457 | name=STRING element=-
+   9 ArrayLit        460   678 | elements=10,11,12,13,14,15,16,17,18
+  10 StringLit       467   484 | value=################
+  11 StringLit       491   508 | value=#..............#
+  12 StringLit       515   532 | value=#.####.#####.#.#
+  13 StringLit       539   556 | value=#.#..#.#...#.#.#
+  14 StringLit       563   580 | value=#.#.##.#.#.#.#.#
+  15 StringLit       587   604 | value=#.#....#.#...#.#
+  16 StringLit       611   628 | value=#.######.#####.#
+  17 StringLit       635   652 | value=#..............#
+  18 StringLit       659   676 | value=################
+  19 Dim             680   717 | name=pared name_span=684-689 type_ref=20 value=21
+  20 TypeRef         693   698 | name=COLOR element=-
+  21 Call            701   716 | callee=22 args=23,24,25
+  22 Name            701   704 | value=rgb
+  23 IntLit          705   707 | value=40
+  24 IntLit          709   711 | value=40
+  25 IntLit          713   715 | value=60
+  26 Dim             717   754 | name=suelo name_span=721-726 type_ref=27 value=28
+  27 TypeRef         730   735 | name=COLOR element=-
+  28 Call            738   753 | callee=29 args=30,31,32
+  29 Name            738   741 | value=rgb
+  30 IntLit          742   744 | value=12
+  31 IntLit          746   748 | value=12
+  32 IntLit          750   752 | value=20
+  33 Dim             754   794 | name=jugador name_span=758-765 type_ref=34 value=35
+  34 TypeRef         769   774 | name=COLOR element=-
+  35 Call            777   793 | callee=36 args=37,38,39
+  36 Name            777   780 | value=rgb
+  37 IntLit          781   784 | value=255
+  38 IntLit          786   789 | value=200
+  39 IntLit          791   792 | value=0
+  40 Dim             795   817 | name=px name_span=799-801 type_ref=41 value=42
+  41 TypeRef         805   811 | name=SINGLE element=-
+  42 IntLit          814   816 | value=32
+  43 Dim             817   839 | name=py name_span=821-823 type_ref=44 value=45
+  44 TypeRef         827   833 | name=SINGLE element=-
+  45 IntLit          836   838 | value=32
+  46 Dim             839   867 | name=velocidad name_span=843-852 type_ref=47 value=48
+  47 TypeRef         856   862 | name=SINGLE element=-
+  48 IntLit          865   866 | value=3
+  49 While           868  1294 | condition=50 body=51,53,87,96,105,114,123,128
+  50 BoolLit         874   878 | value=1
+  51 Primitive       883   893 | name=CLS args=52 inline=0
+  52 Name            887   892 | value=suelo
+  53 For             898  1084 | var=fila var_span=902-906 start=54 stop=55 step=- body=60
+  54 IntLit          909   910 | value=0
+  55 Binary          914   927 | op=- left=56 right=59
+  56 Call            914   923 | callee=57 args=58
+  57 Name            914   917 | value=len
+  58 Name            918   922 | value=mapa
+  59 IntLit          926   927 | value=1
+  60 For             936  1070 | var=col var_span=940-943 start=61 stop=62 step=- body=69
+  61 IntLit          946   947 | value=0
+  62 Binary          951   970 | op=- left=63 right=68
+  63 Call            951   966 | callee=64 args=65
+  64 Name            951   954 | value=len
+  65 Index           955   964 | target=66 index=67
+  66 Name            955   959 | value=mapa
+  67 Name            960   964 | value=fila
+  68 IntLit          969   970 | value=1
+  69 If              983  1053 | condition=70 then_body=77 else_body=- one_liner=1
+  70 Binary          986  1007 | op== left=71 right=76
+  71 Index           986  1000 | target=72 index=75
+  72 Index           986   995 | target=73 index=74
+  73 Name            986   990 | value=mapa
+  74 Name            991   995 | value=fila
+  75 Name            997  1000 | value=col
+  76 StringLit      1005  1007 | value=#
+  77 Primitive      1013  1053 | name=RECT args=78,81,84,85,86 inline=0
+  78 Binary         1018  1026 | op=* left=79 right=80
+  79 Name           1018  1021 | value=col
+  80 IntLit         1024  1026 | value=32
+  81 Binary         1028  1037 | op=* left=82 right=83
+  82 Name           1028  1032 | value=fila
+  83 IntLit         1035  1037 | value=32
+  84 IntLit         1039  1041 | value=32
+  85 IntLit         1043  1045 | value=32
+  86 Name           1047  1052 | value=pared
+  87 If             1089  1126 | condition=88 then_body=91 else_body=- one_liner=1
+  88 Call           1092  1100 | callee=89 args=90
+  89 Name           1092  1095 | value=key
+  90 StringLit      1097  1099 | value=w
+  91 Assign         1106  1126 | target=92 value=93
+  92 Name           1106  1108 | value=py
+  93 Binary         1111  1125 | op=- left=94 right=95
+  94 Name           1111  1113 | value=py
+  95 Name           1116  1125 | value=velocidad
+  96 If             1130  1167 | condition=97 then_body=100 else_body=- one_liner=1
+  97 Call           1133  1141 | callee=98 args=99
+  98 Name           1133  1136 | value=key
+  99 StringLit      1138  1140 | value=s
+ 100 Assign         1147  1167 | target=101 value=102
+ 101 Name           1147  1149 | value=py
+ 102 Binary         1152  1166 | op=+ left=103 right=104
+ 103 Name           1152  1154 | value=py
+ 104 Name           1157  1166 | value=velocidad
+ 105 If             1171  1208 | condition=106 then_body=109 else_body=- one_liner=1
+ 106 Call           1174  1182 | callee=107 args=108
+ 107 Name           1174  1177 | value=key
+ 108 StringLit      1179  1181 | value=a
+ 109 Assign         1188  1208 | target=110 value=111
+ 110 Name           1188  1190 | value=px
+ 111 Binary         1193  1207 | op=- left=112 right=113
+ 112 Name           1193  1195 | value=px
+ 113 Name           1198  1207 | value=velocidad
+ 114 If             1212  1249 | condition=115 then_body=118 else_body=- one_liner=1
+ 115 Call           1215  1223 | callee=116 args=117
+ 116 Name           1215  1218 | value=key
+ 117 StringLit      1220  1222 | value=d
+ 118 Assign         1229  1249 | target=119 value=120
+ 119 Name           1229  1231 | value=px
+ 120 Binary         1234  1248 | op=+ left=121 right=122
+ 121 Name           1234  1236 | value=px
+ 122 Name           1239  1248 | value=velocidad
+ 123 Primitive      1254  1280 | name=CIRCLE args=124,125,126,127 inline=0
+ 124 Name           1261  1263 | value=px
+ 125 Name           1265  1267 | value=py
+ 126 IntLit         1269  1270 | value=8
+ 127 Name           1272  1279 | value=jugador
+ 128 Primitive      1285  1290 | name=FLIP args= inline=0
+
+; 129 nodo(s)

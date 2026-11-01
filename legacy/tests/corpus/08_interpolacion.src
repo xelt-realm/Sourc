@@ -1,0 +1,7 @@
+' La interpolación resuelta en compilación.
+DIM nombre AS STRING = "mundo"
+DIM veces AS INTEGER = 3
+PRINT "hola {nombre}"
+PRINT "calculado: {1 + 2 * 3}"
+PRINT "anidado: {nombre} x {veces}"
+PRINT "literal: {{corchetes}}"

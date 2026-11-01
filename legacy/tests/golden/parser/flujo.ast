@@ -1,0 +1,42 @@
+   0 Program          62   424 | body=1,4,7,10,14,24,29,34
+   1 Dim             156   177 | name=i name_span=160-161 type_ref=2 value=3
+   2 TypeRef         165   172 | name=INTEGER element=-
+   3 IntLit          175   176 | value=0
+   4 Dim             177   203 | name=dos name_span=181-184 type_ref=5 value=6
+   5 TypeRef         188   195 | name=BOOLEAN element=-
+   6 BoolLit         198   202 | value=1
+   7 Dim             203   230 | name=mas name_span=207-210 type_ref=8 value=9
+   8 TypeRef         214   221 | name=BOOLEAN element=-
+   9 BoolLit         224   229 | value=0
+  10 If              230   252 | condition=11 then_body=12 else_body=- one_liner=1
+  11 Name            233   236 | value=dos
+  12 Primitive       242   252 | name=PRINT args=13 inline=0
+  13 StringLit       249   251 | value=a
+  14 If              252   329 | condition=15 then_body=16 else_body=18 one_liner=0
+  15 Name            255   258 | value=dos
+  16 Primitive       266   276 | name=PRINT args=17 inline=0
+  17 StringLit       273   275 | value=b
+  18 If              281   322 | condition=19 then_body=20 else_body=22 one_liner=0
+  19 Name            284   287 | value=mas
+  20 Primitive       295   305 | name=PRINT args=21 inline=0
+  21 StringLit       302   304 | value=c
+  22 Primitive       312   322 | name=PRINT args=23 inline=0
+  23 StringLit       319   321 | value=d
+  24 While           329   353 | condition=25 body=26
+  25 Name            335   338 | value=mas
+  26 Assign          341   348 | target=27 value=28
+  27 Name            341   342 | value=i
+  28 IntLit          345   347 | value=12
+  29 For             353   385 | var=i var_span=357-358 start=30 stop=31 step=- body=32
+  30 IntLit          361   362 | value=0
+  31 IntLit          366   367 | value=2
+  32 Primitive       370   378 | name=PRINT args=33 inline=0
+  33 Name            376   377 | value=i
+  34 For             385   424 | var=i var_span=389-390 start=35 stop=36 step=37 body=38
+  35 IntLit          393   394 | value=2
+  36 IntLit          398   399 | value=0
+  37 IntLit          405   406 | value=1
+  38 Primitive       409   417 | name=PRINT args=39 inline=0
+  39 Name            415   416 | value=i
+
+; 40 nodo(s)

@@ -1,0 +1,58 @@
+   0 Program          33   297 | body=1,4,7,9,11,14,18,22,26,29,39,49
+   1 Dim              34    58 | name=a name_span=38-39 type_ref=2 value=3
+   2 TypeRef          43    50 | name=BOOLEAN element=-
+   3 BoolLit          53    57 | value=1
+   4 Dim              58    83 | name=b name_span=62-63 type_ref=5 value=6
+   5 TypeRef          67    74 | name=BOOLEAN element=-
+   6 BoolLit          77    82 | value=0
+   7 Primitive        83    91 | name=PRINT args=8 inline=0
+   8 Name             89    90 | value=a
+   9 Primitive        91    99 | name=PRINT args=10 inline=0
+  10 Name             97    98 | value=b
+  11 Primitive        99   111 | name=PRINT args=12 inline=0
+  12 Unary           105   110 | op=NOT operand=13
+  13 Name            109   110 | value=a
+  14 Primitive       111   125 | name=PRINT args=15 inline=0
+  15 Binary          117   124 | op=AND left=16 right=17
+  16 Name            117   118 | value=a
+  17 Name            123   124 | value=b
+  18 Primitive       125   138 | name=PRINT args=19 inline=0
+  19 Binary          131   137 | op=OR left=20 right=21
+  20 Name            131   132 | value=a
+  21 Name            136   137 | value=b
+  22 Primitive       138   152 | name=PRINT args=23 inline=0
+  23 Binary          144   151 | op=XOR left=24 right=25
+  24 Name            144   145 | value=a
+  25 Name            150   151 | value=b
+  26 Dim             152   174 | name=n name_span=156-157 type_ref=27 value=28
+  27 TypeRef         161   168 | name=INTEGER element=-
+  28 IntLit          171   173 | value=10
+  29 If              174   214 | condition=30 then_body=37 else_body=- one_liner=1
+  30 Binary          177   193 | op=AND left=31 right=34
+  31 Binary          177   182 | op=> left=32 right=33
+  32 Name            177   178 | value=n
+  33 IntLit          181   182 | value=5
+  34 Binary          187   193 | op=< left=35 right=36
+  35 Name            187   188 | value=n
+  36 IntLit          191   193 | value=20
+  37 Primitive       199   214 | name=PRINT args=38 inline=0
+  38 StringLit       206   213 | value=dentro
+  39 If              214   252 | condition=40 then_body=47 else_body=- one_liner=1
+  40 Binary          217   232 | op=OR left=41 right=44
+  41 Binary          217   222 | op=< left=42 right=43
+  42 Name            217   218 | value=n
+  43 IntLit          221   222 | value=5
+  44 Binary          226   232 | op=> left=45 right=46
+  45 Name            226   227 | value=n
+  46 IntLit          230   232 | value=20
+  47 Primitive       238   252 | name=PRINT args=48 inline=0
+  48 StringLit       245   251 | value=fuera
+  49 If              252   297 | condition=50 then_body=54 else_body=- one_liner=1
+  50 Unary           255   266 | op=NOT operand=51
+  51 Binary          260   266 | op== left=52 right=53
+  52 Name            260   261 | value=n
+  53 IntLit          264   266 | value=10
+  54 Primitive       273   297 | name=PRINT args=55 inline=0
+  55 StringLit       280   296 | value=diez no es diez
+
+; 56 nodo(s)

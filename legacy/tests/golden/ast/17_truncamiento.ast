@@ -1,0 +1,57 @@
+   0 Program          81  1319 | body=1,5,8,12,16,22,26,30,34,40,45,50
+   1 Dim             937   961 | name=neg name_span=941-944 type_ref=2 value=3
+   2 TypeRef         948   955 | name=INTEGER element=-
+   3 Unary           958   960 | op=- operand=4
+   4 IntLit          959   960 | value=9
+   5 Dim             961   984 | name=dos name_span=965-968 type_ref=6 value=7
+   6 TypeRef         972   979 | name=INTEGER element=-
+   7 IntLit          982   983 | value=2
+   8 Primitive      1003  1019 | name=PRINT args=9 inline=0
+   9 Binary         1009  1018 | op=\\ left=10 right=11
+  10 Name           1009  1012 | value=neg
+  11 Name           1015  1018 | value=dos
+  12 Primitive      1019  1035 | name=PRINT args=13 inline=0
+  13 Binary         1025  1034 | op=\\ left=14 right=15
+  14 Name           1025  1028 | value=neg
+  15 Name           1031  1034 | value=neg
+  16 Primitive      1035  1057 | name=PRINT args=17 inline=0
+  17 Binary         1042  1056 | op=\\ left=18 right=21
+  18 Binary         1042  1049 | op=- left=19 right=20
+  19 IntLit         1042  1043 | value=0
+  20 Name           1046  1049 | value=neg
+  21 Name           1053  1056 | value=dos
+  22 Primitive      1086  1104 | name=PRINT args=23 inline=0
+  23 Binary         1092  1103 | op=DIV left=24 right=25
+  24 Name           1092  1095 | value=neg
+  25 Name           1100  1103 | value=dos
+  26 Primitive      1104  1122 | name=PRINT args=27 inline=0
+  27 Binary         1110  1121 | op=DIV left=28 right=29
+  28 Name           1110  1113 | value=neg
+  29 Name           1118  1121 | value=neg
+  30 Primitive      1169  1187 | name=PRINT args=31 inline=0
+  31 Binary         1175  1186 | op=MOD left=32 right=33
+  32 Name           1175  1178 | value=neg
+  33 Name           1183  1186 | value=dos
+  34 Primitive      1187  1211 | name=PRINT args=35 inline=0
+  35 Binary         1194  1210 | op=MOD left=36 right=39
+  36 Binary         1194  1201 | op=- left=37 right=38
+  37 IntLit         1194  1195 | value=0
+  38 Name           1198  1201 | value=neg
+  39 Name           1207  1210 | value=dos
+  40 Primitive      1270  1285 | name=PRINT args=41 inline=0
+  41 Binary         1276  1284 | op=\\ left=42 right=44
+  42 Unary          1276  1280 | op=- operand=43
+  43 FloatLit       1277  1280 | value=9.5
+  44 IntLit         1283  1284 | value=2
+  45 Primitive      1285  1302 | name=PRINT args=46 inline=0
+  46 Binary         1291  1301 | op=DIV left=47 right=49
+  47 Unary          1291  1295 | op=- operand=48
+  48 FloatLit       1292  1295 | value=9.5
+  49 IntLit         1300  1301 | value=2
+  50 Primitive      1302  1319 | name=PRINT args=51 inline=0
+  51 Binary         1308  1318 | op=MOD left=52 right=54
+  52 Unary          1308  1312 | op=- operand=53
+  53 FloatLit       1309  1312 | value=9.5
+  54 IntLit         1317  1318 | value=2
+
+; 55 nodo(s)

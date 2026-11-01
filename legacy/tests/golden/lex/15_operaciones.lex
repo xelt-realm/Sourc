@@ -1,0 +1,435 @@
+  55    56 newline       \n | \n
+  57    58 newline       \n | \n
+ 137   138 newline       \n | \n
+ 219   220 newline       \n | \n
+ 291   292 newline       \n | \n
+ 342   343 newline       \n | \n
+ 344   345 newline       \n | \n
+ 424   425 newline       \n | \n
+ 473   474 newline       \n | \n
+ 474   475 newline       \n | \n
+ 527   528 newline       \n | \n
+ 528   531 keyword       DIM | DIM
+ 532   533 ident         n | n
+ 534   536 keyword       AS | AS
+ 537   544 keyword       INTEGER | INTEGER
+ 545   546 op            = | =
+ 547   548 int           7 | 7
+ 548   549 newline       \n | \n
+ 549   554 keyword       PRINT | PRINT
+ 555   556 ident         n | n
+ 557   558 op            / | /
+ 559   560 int           2 | 2
+ 560   561 newline       \n | \n
+ 561   566 keyword       PRINT | PRINT
+ 567   568 ident         n | n
+ 569   572 keyword       MOD | MOD
+ 573   574 int           2 | 2
+ 574   575 newline       \n | \n
+ 575   580 keyword       PRINT | PRINT
+ 581   582 ident         n | n
+ 583   584 op            \\ | \\
+ 585   586 int           2 | 2
+ 586   587 newline       \n | \n
+ 587   592 keyword       PRINT | PRINT
+ 593   594 ident         n | n
+ 595   598 keyword       DIV | DIV
+ 599   600 int           2 | 2
+ 600   601 newline       \n | \n
+ 601   606 keyword       PRINT | PRINT
+ 607   608 op            - | -
+ 608   609 ident         n | n
+ 610   613 keyword       DIV | DIV
+ 614   615 int           2 | 2
+ 615   616 newline       \n | \n
+ 616   617 newline       \n | \n
+ 663   664 newline       \n | \n
+ 664   667 keyword       DIM | DIM
+ 668   670 ident         s1 | s1
+ 671   673 keyword       AS | AS
+ 674   680 keyword       SINGLE | SINGLE
+ 681   682 op            = | =
+ 683   686 float         6.0 | 6.0
+ 686   687 newline       \n | \n
+ 687   690 keyword       DIM | DIM
+ 691   693 ident         s2 | s2
+ 694   696 keyword       AS | AS
+ 697   703 keyword       SINGLE | SINGLE
+ 704   705 op            = | =
+ 706   709 float         4.0 | 4.0
+ 709   710 newline       \n | \n
+ 710   715 keyword       PRINT | PRINT
+ 716   718 ident         s1 | s1
+ 719   720 op            + | +
+ 721   723 ident         s2 | s2
+ 723   724 newline       \n | \n
+ 724   729 keyword       PRINT | PRINT
+ 730   732 ident         s1 | s1
+ 733   734 op            - | -
+ 735   737 ident         s2 | s2
+ 737   738 newline       \n | \n
+ 738   743 keyword       PRINT | PRINT
+ 744   746 ident         s1 | s1
+ 747   748 op            * | *
+ 749   751 ident         s2 | s2
+ 751   752 newline       \n | \n
+ 752   757 keyword       PRINT | PRINT
+ 758   760 ident         s1 | s1
+ 761   762 op            / | /
+ 763   765 ident         s2 | s2
+ 765   766 newline       \n | \n
+ 766   771 keyword       PRINT | PRINT
+ 772   773 op            - | -
+ 773   775 ident         s1 | s1
+ 775   776 newline       \n | \n
+ 776   781 keyword       PRINT | PRINT
+ 782   784 ident         s1 | s1
+ 785   786 op            < | <
+ 787   789 ident         s2 | s2
+ 789   790 newline       \n | \n
+ 790   795 keyword       PRINT | PRINT
+ 796   798 ident         s1 | s1
+ 799   801 op            <= | <=
+ 802   804 ident         s2 | s2
+ 804   805 newline       \n | \n
+ 805   810 keyword       PRINT | PRINT
+ 811   813 ident         s1 | s1
+ 814   815 op            > | >
+ 816   818 ident         s2 | s2
+ 818   819 newline       \n | \n
+ 819   824 keyword       PRINT | PRINT
+ 825   827 ident         s1 | s1
+ 828   830 op            >= | >=
+ 831   833 ident         s2 | s2
+ 833   834 newline       \n | \n
+ 834   835 newline       \n | \n
+ 872   873 newline       \n | \n
+ 873   876 keyword       DIM | DIM
+ 877   879 ident         d1 | d1
+ 880   882 keyword       AS | AS
+ 883   889 keyword       DOUBLE | DOUBLE
+ 890   891 op            = | =
+ 892   895 float         6.0 | 6.0
+ 895   896 newline       \n | \n
+ 896   899 keyword       DIM | DIM
+ 900   902 ident         d2 | d2
+ 903   905 keyword       AS | AS
+ 906   912 keyword       DOUBLE | DOUBLE
+ 913   914 op            = | =
+ 915   918 float         4.0 | 4.0
+ 918   919 newline       \n | \n
+ 919   924 keyword       PRINT | PRINT
+ 925   927 ident         d1 | d1
+ 928   929 op            + | +
+ 930   932 ident         d2 | d2
+ 932   933 newline       \n | \n
+ 933   938 keyword       PRINT | PRINT
+ 939   941 ident         d1 | d1
+ 942   943 op            - | -
+ 944   946 ident         d2 | d2
+ 946   947 newline       \n | \n
+ 947   952 keyword       PRINT | PRINT
+ 953   955 ident         d1 | d1
+ 956   957 op            * | *
+ 958   960 ident         d2 | d2
+ 960   961 newline       \n | \n
+ 961   966 keyword       PRINT | PRINT
+ 967   969 ident         d1 | d1
+ 970   971 op            / | /
+ 972   974 ident         d2 | d2
+ 974   975 newline       \n | \n
+ 975   980 keyword       PRINT | PRINT
+ 981   983 ident         d1 | d1
+ 984   985 op            < | <
+ 986   988 ident         d2 | d2
+ 988   989 newline       \n | \n
+ 989   994 keyword       PRINT | PRINT
+ 995   997 ident         d1 | d1
+ 998  1000 op            <= | <=
+1001  1003 ident         d2 | d2
+1003  1004 newline       \n | \n
+1004  1009 keyword       PRINT | PRINT
+1010  1012 ident         d1 | d1
+1013  1014 op            > | >
+1015  1017 ident         d2 | d2
+1017  1018 newline       \n | \n
+1018  1023 keyword       PRINT | PRINT
+1024  1026 ident         d1 | d1
+1027  1029 op            >= | >=
+1030  1032 ident         d2 | d2
+1032  1033 newline       \n | \n
+1033  1038 keyword       PRINT | PRINT
+1039  1044 ident         floor | FLOOR
+1044  1045 op            ( | (
+1045  1048 float         2.7 | 2.7
+1048  1049 op            ) | )
+1049  1050 newline       \n | \n
+1050  1055 keyword       PRINT | PRINT
+1056  1058 ident         d1 | d1
+1059  1062 keyword       DIV | DIV
+1063  1065 ident         d2 | d2
+1065  1066 newline       \n | \n
+1066  1071 keyword       PRINT | PRINT
+1072  1074 ident         d1 | d1
+1075  1076 op            \\ | \\
+1077  1079 ident         d2 | d2
+1079  1080 newline       \n | \n
+1080  1085 keyword       PRINT | PRINT
+1086  1088 ident         d1 | d1
+1089  1092 keyword       MOD | MOD
+1093  1095 ident         d2 | d2
+1095  1096 newline       \n | \n
+1096  1097 newline       \n | \n
+1142  1143 newline       \n | \n
+1144  1145 newline       \n | \n
+1222  1223 newline       \n | \n
+1296  1297 newline       \n | \n
+1377  1378 newline       \n | \n
+1454  1455 newline       \n | \n
+1531  1532 newline       \n | \n
+1583  1584 newline       \n | \n
+1584  1589 keyword       PRINT | PRINT
+1590  1591 op            ( | (
+1591  1593 ident         s1 | s1
+1594  1595 op            = | =
+1596  1598 ident         s2 | s2
+1598  1599 op            ) | )
+1599  1600 newline       \n | \n
+1600  1605 keyword       PRINT | PRINT
+1606  1607 op            ( | (
+1607  1609 ident         s1 | s1
+1610  1611 op            = | =
+1612  1615 float         6.0 | 6.0
+1615  1616 op            ) | )
+1616  1617 newline       \n | \n
+1617  1622 keyword       PRINT | PRINT
+1623  1624 op            ( | (
+1624  1626 ident         s1 | s1
+1627  1629 op            <> | <>
+1630  1632 ident         s2 | s2
+1632  1633 op            ) | )
+1633  1634 newline       \n | \n
+1634  1639 keyword       PRINT | PRINT
+1640  1641 op            ( | (
+1641  1643 ident         d1 | d1
+1644  1645 op            = | =
+1646  1648 ident         d2 | d2
+1648  1649 op            ) | )
+1649  1650 newline       \n | \n
+1650  1655 keyword       PRINT | PRINT
+1656  1657 op            ( | (
+1657  1659 ident         d1 | d1
+1660  1661 op            = | =
+1662  1665 float         6.0 | 6.0
+1665  1666 op            ) | )
+1666  1667 newline       \n | \n
+1667  1672 keyword       PRINT | PRINT
+1673  1674 op            ( | (
+1674  1676 ident         d1 | d1
+1677  1679 op            <> | <>
+1680  1682 ident         d2 | d2
+1682  1683 op            ) | )
+1683  1684 newline       \n | \n
+1684  1689 keyword       PRINT | PRINT
+1690  1691 op            ( | (
+1691  1694 float         0.0 | 0.0
+1695  1696 op            = | =
+1697  1698 op            - | -
+1698  1701 float         0.0 | 0.0
+1701  1702 op            ) | )
+1702  1703 newline       \n | \n
+1703  1708 keyword       PRINT | PRINT
+1709  1710 op            ( | (
+1710  1711 op            - | -
+1711  1714 float         0.0 | 0.0
+1715  1717 op            <> | <>
+1718  1721 float         0.0 | 0.0
+1721  1722 op            ) | )
+1722  1723 newline       \n | \n
+1723  1724 newline       \n | \n
+1774  1775 newline       \n | \n
+1775  1780 keyword       PRINT | PRINT
+1781  1782 op            ( | (
+1783  1788 string        hola | hola
+1789  1790 op            = | =
+1792  1797 string        hola | hola
+1797  1798 op            ) | )
+1798  1799 newline       \n | \n
+1799  1804 keyword       PRINT | PRINT
+1805  1806 op            ( | (
+1807  1812 string        hola | hola
+1813  1814 op            = | =
+1816  1822 string        adios | adios
+1822  1823 op            ) | )
+1823  1824 newline       \n | \n
+1824  1829 keyword       PRINT | PRINT
+1830  1837 ident         compare | COMPARE
+1837  1838 op            ( | (
+1839  1844 string        hola | hola
+1844  1845 op            , | ,
+1847  1853 string        adios | adios
+1853  1854 op            ) | )
+1854  1855 newline       \n | \n
+1855  1860 keyword       PRINT | PRINT
+1861  1868 ident         compare | COMPARE
+1868  1869 op            ( | (
+1870  1876 string        adios | adios
+1876  1877 op            , | ,
+1879  1884 string        hola | hola
+1884  1885 op            ) | )
+1885  1886 newline       \n | \n
+1886  1891 keyword       PRINT | PRINT
+1892  1899 ident         compare | COMPARE
+1899  1900 op            ( | (
+1901  1906 string        hola | hola
+1906  1907 op            , | ,
+1909  1914 string        hola | hola
+1914  1915 op            ) | )
+1915  1916 newline       \n | \n
+1916  1917 newline       \n | \n
+1952  1953 newline       \n | \n
+1953  1956 keyword       DIM | DIM
+1957  1963 ident         cierto | cierto
+1964  1966 keyword       AS | AS
+1967  1974 keyword       BOOLEAN | BOOLEAN
+1975  1976 op            = | =
+1977  1978 int           1 | 1
+1978  1979 newline       \n | \n
+1979  1984 keyword       PRINT | PRINT
+1985  1991 ident         cierto | cierto
+1991  1992 newline       \n | \n
+1992  1993 newline       \n | \n
+2024  2025 newline       \n | \n
+2025  2028 keyword       DIM | DIM
+2029  2036 ident         numeros | numeros
+2037  2039 keyword       AS | AS
+2040  2045 keyword       ARRAY | ARRAY
+2046  2048 keyword       OF | OF
+2049  2056 keyword       INTEGER | INTEGER
+2057  2058 op            = | =
+2059  2062 keyword       NEW | NEW
+2063  2070 keyword       INTEGER | INTEGER
+2070  2071 op            [ | [
+2071  2072 int           3 | 3
+2072  2073 op            ] | ]
+2073  2074 newline       \n | \n
+2074  2081 ident         numeros | numeros
+2081  2082 op            [ | [
+2082  2083 int           0 | 0
+2083  2084 op            ] | ]
+2085  2086 op            = | =
+2087  2088 int           1 | 1
+2088  2089 newline       \n | \n
+2089  2096 ident         numeros | numeros
+2096  2097 op            [ | [
+2097  2098 int           1 | 1
+2098  2099 op            ] | ]
+2100  2101 op            = | =
+2102  2103 int           2 | 2
+2103  2104 newline       \n | \n
+2104  2109 keyword       PRINT | PRINT
+2110  2117 ident         numeros | numeros
+2117  2118 newline       \n | \n
+2118  2119 newline       \n | \n
+2187  2188 newline       \n | \n
+2188  2191 keyword       DIM | DIM
+2192  2199 ident         tablero | tablero
+2200  2202 keyword       AS | AS
+2203  2208 keyword       ARRAY | ARRAY
+2209  2211 keyword       OF | OF
+2212  2217 keyword       ARRAY | ARRAY
+2218  2220 keyword       OF | OF
+2221  2228 keyword       INTEGER | INTEGER
+2229  2230 op            = | =
+2231  2232 op            [ | [
+2233  2234 op            [ | [
+2234  2235 int           1 | 1
+2235  2236 op            , | ,
+2237  2238 int           2 | 2
+2238  2239 op            ] | ]
+2239  2240 op            , | ,
+2241  2242 op            [ | [
+2242  2243 int           3 | 3
+2243  2244 op            ] | ]
+2245  2246 op            ] | ]
+2246  2247 newline       \n | \n
+2247  2252 keyword       PRINT | PRINT
+2253  2260 ident         tablero | tablero
+2260  2261 newline       \n | \n
+2261  2268 ident         tablero | tablero
+2268  2269 op            [ | [
+2269  2270 int           1 | 1
+2270  2271 op            ] | ]
+2271  2272 op            [ | [
+2272  2273 int           0 | 0
+2273  2274 op            ] | ]
+2275  2276 op            = | =
+2277  2278 int           9 | 9
+2278  2279 newline       \n | \n
+2279  2284 keyword       PRINT | PRINT
+2285  2292 ident         tablero | tablero
+2292  2293 newline       \n | \n
+2293  2298 keyword       PRINT | PRINT
+2299  2306 ident         tablero | tablero
+2306  2307 op            [ | [
+2307  2308 int           0 | 0
+2308  2309 op            ] | ]
+2309  2310 op            [ | [
+2310  2311 int           1 | 1
+2311  2312 op            ] | ]
+2312  2313 newline       \n | \n
+2313  2314 newline       \n | \n
+2349  2350 newline       \n | \n
+2350  2353 keyword       DIM | DIM
+2354  2361 ident         nombres | nombres
+2362  2364 keyword       AS | AS
+2365  2370 keyword       ARRAY | ARRAY
+2371  2373 keyword       OF | OF
+2374  2379 keyword       ARRAY | ARRAY
+2380  2382 keyword       OF | OF
+2383  2389 keyword       STRING | STRING
+2390  2391 op            = | =
+2392  2393 op            [ | [
+2394  2395 op            [ | [
+2396  2400 string        uno | uno
+2400  2401 op            ] | ]
+2401  2402 op            , | ,
+2403  2404 op            [ | [
+2405  2409 string        dos | dos
+2409  2410 op            , | ,
+2412  2417 string        tres | tres
+2417  2418 op            ] | ]
+2419  2420 op            ] | ]
+2420  2421 newline       \n | \n
+2421  2426 keyword       PRINT | PRINT
+2427  2434 ident         nombres | nombres
+2434  2435 newline       \n | \n
+2435  2436 newline       \n | \n
+2483  2484 newline       \n | \n
+2484  2487 keyword       DIM | DIM
+2488  2497 ident         decimales | decimales
+2498  2500 keyword       AS | AS
+2501  2506 keyword       ARRAY | ARRAY
+2507  2509 keyword       OF | OF
+2510  2516 keyword       SINGLE | SINGLE
+2517  2518 op            = | =
+2519  2522 keyword       NEW | NEW
+2523  2529 keyword       SINGLE | SINGLE
+2529  2530 op            [ | [
+2530  2531 int           2 | 2
+2531  2532 op            ] | ]
+2532  2533 newline       \n | \n
+2533  2542 ident         decimales | decimales
+2542  2543 op            [ | [
+2543  2544 int           0 | 0
+2544  2545 op            ] | ]
+2546  2547 op            = | =
+2548  2551 float         1.5 | 1.5
+2551  2552 newline       \n | \n
+2552  2557 keyword       PRINT | PRINT
+2558  2567 ident         decimales | decimales
+2567  2568 newline       \n | \n
+2568  2569 newline       \n | \n
+2569  2569 eof            | 
+
+; 433 token(s)

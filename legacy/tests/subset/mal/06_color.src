@@ -1,0 +1,6 @@
+' `COLOR n` es la sentencia de paleta (ADR 0005). Construir un color con `RGB`
+' sí está permitido --lo necesita la firma de un literal--, pero cambiar la
+' paleta global es dibujo, y el compilador no dibuja.
+
+COLOR 5
+PRINT 1

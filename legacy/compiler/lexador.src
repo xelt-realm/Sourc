@@ -1,0 +1,764 @@
+' Lexador de Sourc escrito en Sourc. Rebanada 1 del bootstrap (Fase 8).
+'
+' Este fichero NO es un programa completo: es el cuerpo del lexador, y quien lo
+' compila le antepone una línea con el texto que hay que lexar, algo como
+'
+'     DIM src AS STRING = "..."
+'
+' El generador pone `volcarTokens`. A FALSE cuando el lexer va delante de un
+' parser, que lee los tokens de los arrays y no del texto: si los dos imprimen,
+' la salida del programa es la del lexer y luego la del parser, y el golden del
+' AST no está en ningún sitio.
+'
+' Su salida es el flujo de tokens en la forma canónica de `sourc lex`, y su
+' juez son los goldens de tests/golden/lex/. El generador es
+' tools/bootstrap.py. Ver docs/BOOTSTRAP.md.
+'
+' Además del texto, deja los tokens en cinco arrays paralelos --tipo, valor,
+' texto, inicio y fin-- porque el parser los necesita para construir el AST, y
+' porque un token que sólo existe como línea de texto no lo puede leer nadie.
+' El bucle final imprime desde los arrays, y eso es lo que deja el formato en un
+' solo sitio: antes había quince copias de él, una por punto de emisión, y
+' quince sitios donde equivocarse.
+'
+' Tres restricciones del lenguaje mandan sobre la forma de este fichero, y
+' ninguna es casual:
+'
+' 1. Una FUNCTION no puede tocar un global (E0067). Por eso los predicados de
+'    abajo son FUNCTION puras --entrada, salida-- y toda la máquina de estados
+'    vive en el nivel superior, donde sí se ven los globales. Lo único que no
+'    cabe así es "dónde me he quedado", y eso se devuelve como valor.
+' 2. Los parámetros son por valor. Ninguna FUNCTION puede cambiar el estado de
+'    quien llama, así que "actualiza la posición" tiene que ser "devuelve la
+'    nueva posición".
+' 3. GOTO y GOSUB están en la gramática pero no bajan a IR (E0043), y STRUCT es
+'    sólo un nombre de tipo, sin forma de declararlo. No hay subrutina con
+'    estado compartido, y no la hay por un motivo que este fichero deja a la
+'    vista: falta la Fase 4.
+'
+' Dos huecos, declarados y con motivo, en vez de escondidos:
+'
+' - Los escapes \u{...}. Decodificarlos exige pasar de un entero a un carácter y
+'   no hay CHR. Una tabla con los caracteres imprimibles resolvería el rango
+'   ASCII dentro de las premises, pero el rango no-ASCII no cabe en ninguna, así
+'   que la rebanada se queda sin \u entero. tools/bootstrap.py mide lo que
+'   falta en vez de suponer que no falta.
+' - Los errores léxicos. El de Python acumula diagnósticos y sigue; éste sólo
+'   emite tokens, y un carácter inesperado aquí se trata como operador. La
+'   rebanada 2 es el parser, y con ella llegan los E0001.
+
+' ==========================================================================
+' Predicados. Cada uno es una pregunta sobre un código de carácter, y cada uno
+' tiene su rango escrito a mano. Un rango se lee de un vistazo; una lista de
+' veinte comparaciones con literales se lee comparando.
+
+FUNCTION EsDigito(c AS INTEGER) AS BOOLEAN
+  RETURN c >= 48 AND c <= 57
+END FUNCTION
+
+FUNCTION EsHexa(c AS INTEGER) AS BOOLEAN
+  RETURN (c >= 48 AND c <= 57) OR (c >= 65 AND c <= 70) OR (c >= 97 AND c <= 102)
+END FUNCTION
+
+FUNCTION EsLetra(c AS INTEGER) AS BOOLEAN
+  RETURN (c >= 65 AND c <= 90) OR (c >= 97 AND c <= 122)
+END FUNCTION
+
+FUNCTION EsBlanco(c AS INTEGER) AS BOOLEAN
+  RETURN c = 32 OR c = 9 OR c = 13
+END FUNCTION
+
+' Los identificadores empiezan por letra o '_' y siguen con letra, '_' o
+' dígito. La diferencia entre las dos reglas no es simetría: "a1" es un
+' identificador y "1a" son dos cosas, y por eso hay dos funciones y no una con
+' un parámetro.
+FUNCTION EsInicioIdent(c AS INTEGER) AS BOOLEAN
+  RETURN c = 95 OR EsLetra(c)
+END FUNCTION
+
+FUNCTION EsSigueIdent(c AS INTEGER) AS BOOLEAN
+  RETURN c = 95 OR EsLetra(c) OR EsDigito(c)
+END FUNCTION
+
+' Un byte de continuación UTF-8 empieza por 10xxxxxx. Hace falta porque el
+' lexador de Python cuenta posiciones en CARACTERES y éste tiene bytes: sin
+' esto, un acento dentro de un comentario corrige todas las columnas que
+' vienen detrás, y 13 de los 19 programas tienen acentos.
+FUNCTION EsContinuacion(c AS INTEGER) AS BOOLEAN
+  RETURN c >= 128 AND c <= 191
+END FUNCTION
+
+' Cuántos caracteres hay en s[desde, hasta), contando bytes. Los bytes de
+' continuación UTF-8 no son caracteres, y sin esta cuenta un comentario con un
+' acento dejaría todas las columnas siguientes detrás.
+FUNCTION CuentaChars(s AS STRING, desde AS INTEGER, hasta AS INTEGER) AS INTEGER
+  DIM n AS INTEGER = 0
+  DIM i AS INTEGER = 0
+  FOR i = desde TO hasta - 1
+    IF NOT EsContinuacion(CHARCODE(s, i)) THEN
+      n = n + 1
+    END IF
+  NEXT i
+  RETURN n
+END FUNCTION
+
+' Los dígitos que valen detrás de cada prefijo: &H hexadecimales, &B binarios y
+' &O octales. No hay forma de decir "cualquier dígito" para uno de los tres, así
+' que se pregunta dos veces.
+FUNCTION EsDigitoDePrefijo(pc AS INTEGER, c AS INTEGER) AS BOOLEAN
+  IF pc = 72 OR pc = 104 THEN
+    RETURN EsHexa(c)
+  END IF
+  IF pc = 66 OR pc = 98 THEN
+    RETURN c = 48 OR c = 49
+  END IF
+  RETURN c >= 48 AND c <= 55
+END FUNCTION
+
+' Plegar el caso de los bytes s[desde, hasta). Devuelve una cadena nueva.
+'
+' Plegar por byte es correcto con texto UTF-8: los rangos ASCII 65-90 y 97-122
+' no aparecen nunca dentro de una secuencia multibyte, así que tocar un byte
+' ASCII nunca parte un carácter. Y la tabla es la de las 52 letras, porque sólo
+' hay dos casos que plegar y no hace falta una para los 128 imprimibles.
+FUNCTION Plegar(s AS STRING, desde AS INTEGER, hasta AS INTEGER, arriba AS BOOLEAN) AS STRING
+  DIM r AS STRING = ""
+  DIM i AS INTEGER = 0
+  DIM c AS INTEGER = 0
+  FOR i = desde TO hasta - 1
+    c = CHARCODE(s, i)
+    IF arriba AND c >= 97 AND c <= 122 THEN
+      r = r & MID("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", c - 97, 1)
+    ELSE
+      IF (NOT arriba) AND c >= 65 AND c <= 90 THEN
+        r = r & MID("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", c - 65 + 26, 1)
+      ELSE
+        r = r & MID(s, i, 1)
+      END IF
+    END IF
+  NEXT i
+  RETURN r
+END FUNCTION
+
+' ¿Es una palabra clave? Se busca con espacios de borde para que "END" no
+' aparezca dentro de "APPEND": sin ellos CONTAINS daría un falso positivo, y un
+' falso positivo convierte un identificador en palabra clave, que es un error de
+' compilación en la línea siguiente.
+FUNCTION EsPalabraClave(mayus AS STRING) AS BOOLEAN
+  RETURN CONTAINS(" DIM AS ARRAY OF NEW STRUCT FUNCTION END RETURN IF THEN ELSE WHILE WEND FOR TO STEP NEXT GOTO GOSUB AND OR NOT XOR MOD DIV TRUE FALSE NIL USE IMPORT FROM ARENA RESET PRINT SCREEN OFF CLS PSET LINE RECT FILLED CIRCLE TRIANGLE TEXT FLIP COLOR INTEGER SINGLE DOUBLE STRING BOOLEAN VEC2 VEC3 VEC4 MAT3 MAT4 VOID ", " " & mayus & " ")
+END FUNCTION
+
+' ¿Estamos en un REM que es comentario y no un identificador?
+'
+' Se exige que lo que siga sea exactamente REM y que detrás no venga un
+' carácter de identificador, para que "remolque" siga siendo un identificador.
+'
+' No se exige que sea al principio de línea, aunque el docstring del lexador de
+' Python diga que sí. Se sigue al código y no al comentario: el juez son los
+' goldens, y un "REM" a mitad de línea es un identificador en el de Python. Si
+' algún día se decide que el comentario gana, esto cambia y los goldens avisan.
+' Y ahora los guardas de posición.
+'
+' Source NO cortocircuita AND: `pos < largo AND CHARCODE(src, pos)` evalúa las
+' dos partes, y con pos == largo el lado derecho lee un byte que no existe. No es
+' una peculiaridad de este fichero: es una regla del lenguaje, y la forma de
+' escribir contra ella es no poner nunca una llamada que indexa en la misma
+' expresión que comprueba el límite.
+'
+' Por eso estas funciones existen. `WHILE pos < largo AND EsSigueIdent(...)` es
+' un programa que funciona en todos los ficheros que acaban en salto de línea y
+' revienta en el último carácter de los que no acaban en uno, que es la peor
+' forma posible de fallo: verde en la suite y rojo en el fichero que nadie
+' escribió a mano porque se copió de otro sitio.
+FUNCTION ActualEs(s AS STRING, pos AS INTEGER, largo AS INTEGER, c AS INTEGER) AS BOOLEAN
+  IF pos >= largo THEN
+    RETURN FALSE
+  END IF
+  RETURN CHARCODE(s, pos) = c
+END FUNCTION
+
+FUNCTION SiguienteEs(s AS STRING, pos AS INTEGER, largo AS INTEGER, c AS INTEGER) AS BOOLEAN
+  IF pos + 1 >= largo THEN
+    RETURN FALSE
+  END IF
+  RETURN CHARCODE(s, pos + 1) = c
+END FUNCTION
+
+FUNCTION SigueIdent(s AS STRING, pos AS INTEGER, largo AS INTEGER) AS BOOLEAN
+  IF pos >= largo THEN
+    RETURN FALSE
+  END IF
+  RETURN EsSigueIdent(CHARCODE(s, pos))
+END FUNCTION
+
+FUNCTION EsDigitoEn(s AS STRING, pos AS INTEGER, largo AS INTEGER) AS BOOLEAN
+  IF pos >= largo THEN
+    RETURN FALSE
+  END IF
+  RETURN EsDigito(CHARCODE(s, pos))
+END FUNCTION
+
+FUNCTION EsDigitoPrefijoEn(s AS STRING, pos AS INTEGER, largo AS INTEGER, pc AS INTEGER) AS BOOLEAN
+  IF pos >= largo THEN
+    RETURN FALSE
+  END IF
+  RETURN EsDigitoDePrefijo(pc, CHARCODE(s, pos))
+END FUNCTION
+
+' EsRemAqui y las de aquí son todas la misma pregunta con distinto predicado, y
+' por eso todas empiezan igual: primero el límite, luego el índice. Al revés,
+' el índice va primero y el compilador ni se queja.
+FUNCTION EsRemAqui(s AS STRING, pos AS INTEGER, largo AS INTEGER) AS BOOLEAN
+  IF pos + 3 > largo THEN
+    RETURN FALSE
+  END IF
+  IF Plegar(s, pos, pos + 3, TRUE) <> "REM" THEN
+    RETURN FALSE
+  END IF
+  IF pos + 3 >= largo THEN
+    RETURN TRUE
+  END IF
+  RETURN NOT EsSigueIdent(CHARCODE(s, pos + 3))
+END FUNCTION
+
+' Alinear a la derecha. La puerta de `sourc lex` imprime la columna en cuatro
+' posiciones y sin esto el golden dependería del formato entero.
+FUNCTION RellenaDer(texto AS STRING, ancho AS INTEGER) AS STRING
+  DIM r AS STRING = texto
+  WHILE LEN(r) < ancho
+    r = " " & r
+  WEND
+  RETURN r
+END FUNCTION
+
+FUNCTION RellenaIzq(texto AS STRING, ancho AS INTEGER) AS STRING
+  DIM r AS STRING = texto
+  WHILE LEN(r) < ancho
+    r = r & " "
+  WEND
+  RETURN r
+END FUNCTION
+
+' Un texto en una línea, escapado igual que visible() en el compilador.
+'
+' El orden importa: la barra invertida va antes que la barra vertical. Al revés,
+' la barra invertida del escape de la segunda escaparía la primera y el texto
+' dejaría de deshacerse de una sola manera.
+FUNCTION Visible(s AS STRING) AS STRING
+  DIM r AS STRING = ""
+  DIM i AS INTEGER = 0
+  DIM c AS INTEGER = 0
+  FOR i = 0 TO LEN(s) - 1
+    c = CHARCODE(s, i)
+    IF c = 92 THEN
+      ' Cuatro barras en el literal, dos en la salida: visible() escapa la
+      ' barra invertida duplicándola, y para escribir dos hay queescapar cada
+      ' una. Con dos en el literal sale una, que es un golden que no casa y un
+      ' compilador que no puede distinguir "\\" de "\".
+      r = r & "\\\\"
+    ELSE
+      IF c = 10 THEN
+        r = r & "\\n"
+      ELSE
+        IF c = 13 THEN
+          r = r & "\\r"
+        ELSE
+          IF c = 9 THEN
+            r = r & "\\t"
+          ELSE
+            IF c = 124 THEN
+              ' "\p" no es un escape válido en Source --los válidos son \n \t \r
+              ' \0 \\ \" \' y \u{...}-- así que la barra y la "p" se
+              ' concatenan. Es el precio de escribir en un lenguaje el escape de
+              ' otro, y la puerta que comprueba que visible() no se confunde con
+              ' sí mismo es la que se encarga de que esto siga siendo cierto.
+              r = r & "\\\\" & "p"
+            ELSE
+              r = r & MID(s, i, 1)
+            END IF
+          END IF
+        END IF
+      END IF
+    END IF
+  NEXT i
+  RETURN r
+END FUNCTION
+
+' Una línea de token completa: columna, tipo, valor y texto. Las dos últimas
+' columnas están porque son cosas distintas: el valor es lo que consume el
+' parser y el texto es lo que sale en un diagnóstico. Aquí coinciden para todo
+' menos las palabras clave y los identificadores, donde el valor va plegado y el
+' texto no, y esa diferencia es justo la que un golden que guardara sólo el
+' valor no detectaría.
+FUNCTION LineaToken(col AS INTEGER, fin AS INTEGER, tipo AS STRING, valor AS STRING, texto AS STRING) AS STRING
+  RETURN RellenaDer(STR(col), 4) & " " & RellenaDer(STR(fin), 5) & " " & RellenaIzq(tipo, 13) & " " & Visible(valor) & " | " & Visible(texto)
+END FUNCTION
+
+' ==========================================================================
+' Estado. Todo aquí es global porque E0067 impide que una FUNCTION lo toque, y
+' por eso la máquina de estados de abajo no puede ser una.
+
+DIM NL AS STRING = "\n"
+DIM largo AS INTEGER = 0
+DIM pos AS INTEGER = 0
+DIM col AS INTEGER = 0
+DIM tkN AS INTEGER = 0
+DIM tkTipo AS ARRAY OF STRING = NEW STRING[4096]
+DIM tkValor AS ARRAY OF STRING = NEW STRING[4096]
+DIM tkTexto AS ARRAY OF STRING = NEW STRING[4096]
+DIM tkCol AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM tkFin AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM i AS INTEGER = 0
+DIM buf AS STRING = ""
+DIM bufCol AS INTEGER = 0
+DIM abierto AS BOOLEAN = FALSE
+DIM vaciaOK AS BOOLEAN = FALSE
+DIM quieto AS BOOLEAN = FALSE
+DIM seguir AS BOOLEAN = FALSE
+DIM c AS INTEGER = 0
+DIM e AS INTEGER = 0
+DIM ini AS INTEGER = 0
+DIM iniCol AS INTEGER = 0
+DIM fin AS INTEGER = 0
+DIM ojo AS INTEGER = 0
+DIM ojoCol AS INTEGER = 0
+DIM pc AS INTEGER = 0
+DIM coma AS BOOLEAN = FALSE
+DIM doble AS BOOLEAN = FALSE
+DIM palabra AS STRING = ""
+DIM mayus AS STRING = ""
+DIM numero AS STRING = ""
+DIM trozo AS STRING = ""
+
+largo = LEN(src)
+
+' El bucle principal. Al final avanza una posición salvo que quieto lo diga, y
+' quieto es lo que permite que cada rama se consuma a sí misma sin avanzar dos
+' veces. Es un `continue` con otro nombre, porque no hay CONTINUE.
+WHILE pos < largo
+  quieto = FALSE
+  c = CHARCODE(src, pos)
+
+  ' ¿Estamos dentro de un texto? Entonces el cuerpo manda y el resto del bucle
+  ' espera. Es el único trozo con dos salidas --comilla de cierre o llave--, y
+  ' por eso va primero y no al final: si fuera al final, cada rama del resto
+  ' tendría que acordarse de saltárselo.
+  IF abierto THEN
+    buf = ""
+    seguir = TRUE
+    WHILE seguir AND pos < largo
+      c = CHARCODE(src, pos)
+      IF c = 125 THEN
+        IF SiguienteEs(src, pos, largo, 125) THEN
+          ' "}}" es una llave literal. Sale del propio fuente porque escribir
+          ' "}" dentro de un literal cerraría la interpolación.
+          buf = buf & MID(src, pos, 1)
+          pos = pos + 2
+          col = col + 2
+        ELSE
+          ' Una llave suelta cierra la interpolación que el parser espera. El
+          ' fragmento anterior sólo se emite si no está vacío: entre "}" y la
+          ' comilla de cierre no hay texto, y un token de texto vacío haría que
+          ' el parser viera dos textos contiguos.
+          IF LEN(buf) > 0 THEN
+            tkTipo[tkN] = "string"
+            tkValor[tkN] = buf
+            tkTexto[tkN] = buf
+            tkCol[tkN] = bufCol
+            tkFin[tkN] = col
+            tkN = tkN + 1
+            buf = ""
+          END IF
+          tkTipo[tkN] = "op"
+          tkValor[tkN] = MID(src, pos, 1)
+          tkTexto[tkN] = MID(src, pos, 1)
+          tkCol[tkN] = col
+          tkFin[tkN] = col + 1
+          tkN = tkN + 1
+          pos = pos + 1
+          col = col + 1
+          bufCol = col
+        END IF
+      ELSE
+        IF c = 123 THEN
+          IF SiguienteEs(src, pos, largo, 123) THEN
+            buf = buf & MID(src, pos, 1)
+            pos = pos + 2
+            col = col + 2
+          ELSE
+            tkTipo[tkN] = "string"
+            tkValor[tkN] = buf
+            tkTexto[tkN] = buf
+            tkCol[tkN] = bufCol
+            tkFin[tkN] = col
+            tkN = tkN + 1
+            tkTipo[tkN] = "op"
+            tkValor[tkN] = MID(src, pos, 1)
+            tkTexto[tkN] = MID(src, pos, 1)
+            tkCol[tkN] = col
+            tkFin[tkN] = col + 1
+            tkN = tkN + 1
+            pos = pos + 1
+            col = col + 1
+            bufCol = col
+            ' La llave abre el cÓDIGO, no el texto. Dejar "abierto" en True
+            ' hacía que lo que va entre llaves se lexara como contenido de
+            ' cadena, y "nombre" salía como string donde tiene que salir como
+            ' identificador.
+            abierto = FALSE
+            vaciaOK = TRUE
+            seguir = FALSE
+          END IF
+        ELSE
+          IF c = 34 THEN
+            pos = pos + 1
+            col = col + 1
+            IF LEN(buf) > 0 OR vaciaOK THEN
+              tkTipo[tkN] = "string"
+              tkValor[tkN] = buf
+              tkTexto[tkN] = buf
+              tkCol[tkN] = bufCol
+              tkFin[tkN] = col
+              tkN = tkN + 1
+            END IF
+            buf = ""
+            abierto = FALSE
+            vaciaOK = FALSE
+            seguir = FALSE
+          ELSE
+            IF c = 92 THEN
+              pos = pos + 1
+              col = col + 1
+              IF pos < largo THEN
+                e = CHARCODE(src, pos)
+                pos = pos + 1
+                col = col + 1
+                IF e = 110 THEN
+                  buf = buf & "\n"
+                ELSE
+                  IF e = 116 THEN
+                    buf = buf & "\t"
+                  ELSE
+                    IF e = 114 THEN
+                      buf = buf & "\r"
+                    ELSE
+                      IF e = 48 THEN
+                        buf = buf & "\0"
+                      ELSE
+                        IF e = 92 THEN
+                          buf = buf & "\\"
+                        ELSE
+                          IF e = 34 THEN
+                            buf = buf & "\""
+                          ELSE
+                            IF e = 39 THEN
+                              buf = buf & "'"
+                            ELSE
+                              buf = buf & MID(src, pos - 1, 1)
+                            END IF
+                          END IF
+                        END IF
+                      END IF
+                    END IF
+                  END IF
+                END IF
+              END IF
+            ELSE
+              IF c = 10 THEN
+                IF LEN(buf) > 0 OR vaciaOK THEN
+                  tkTipo[tkN] = "string"
+                  tkValor[tkN] = buf
+                  tkTexto[tkN] = buf
+                  tkCol[tkN] = bufCol
+                  tkFin[tkN] = col
+                  tkN = tkN + 1
+                END IF
+                buf = ""
+                abierto = FALSE
+                vaciaOK = FALSE
+                seguir = FALSE
+              ELSE
+                ' Un carácter, pero dos bytes si no es ASCII. La columna sube
+                ' sólo por el byte que empieza un carácter, que es lo que hace
+                ' el avance del bucle principal y lo que hay que repetir aquí:
+                ' dentro de un texto el avance es propio y se olvidaba, y el
+                ' síntoma era una columna de más detrás de cada letra acentuada
+                ' dentro de un literal -- no detrás del fichero entero.
+                buf = buf & MID(src, pos, 1)
+                pos = pos + 1
+                IF NOT EsContinuacion(c) THEN
+                  col = col + 1
+                END IF
+              END IF
+            END IF
+          END IF
+        END IF
+      END IF
+    WEND
+    quieto = TRUE
+
+  ELSE
+    ' Una llave suelta fuera de un texto. El lexador de Python la acepta y es el
+    ' parser quien protesta; aquí igual, porque el juez tiene que ser el mismo
+    ' en las dos implementaciones.
+    IF c = 125 THEN
+      tkTipo[tkN] = "op"
+      tkValor[tkN] = MID(src, pos, 1)
+      tkTexto[tkN] = MID(src, pos, 1)
+      tkCol[tkN] = col
+      tkFin[tkN] = col + 1
+      tkN = tkN + 1
+      pos = pos + 1
+      col = col + 1
+      bufCol = col
+      quieto = TRUE
+      abierto = TRUE
+      vaciaOK = FALSE
+    ELSE
+      IF EsBlanco(c) THEN
+        ' Avanza los dos. Si sólo avanzara pos y dejara que el avance final
+        ' sumara la columna, ese avance leería un byte que ya se pasó y la
+        ' cuenta iría detrás. Y quieto porque si no, pos avanza dos veces y se
+        ' come el carácter siguiente: por eso el blanco se llevaba la comilla de
+        ' apertura del primer texto de este fichero.
+        pos = pos + 1
+        col = col + 1
+        quieto = TRUE
+      ELSE
+        IF c = 10 THEN
+          tkTipo[tkN] = "newline"
+          tkValor[tkN] = NL
+          tkTexto[tkN] = NL
+          tkCol[tkN] = col
+          tkFin[tkN] = col + 1
+          tkN = tkN + 1
+          pos = pos + 1
+          col = col + 1
+          quieto = TRUE
+        ELSE
+          ' Comentario con apóstrofo: hasta el fin de línea. Se queda EN el
+          ' salto de línea y marca quieto a propósito, para que sea la rama del
+          ' salto de línea la que lo emita como token. Si el comentario se
+          ' comiera el salto, el número de líneas del token stream bajaría en
+          ' uno por cada comentario, y eso es justo lo que pasaba.
+          IF c = 39 THEN
+            trozo = MID(src, pos, largo - pos)
+            ini = pos
+            fin = INDEXOF(trozo, NL)
+            IF fin < 0 THEN
+              pos = largo
+            ELSE
+              pos = pos + fin
+            END IF
+            col = col + CuentaChars(src, ini, pos)
+            quieto = TRUE
+          ELSE
+            IF (c = 82 OR c = 114) AND EsRemAqui(src, pos, largo) THEN
+              trozo = MID(src, pos, largo - pos)
+              ini = pos
+              fin = INDEXOF(trozo, NL)
+              IF fin < 0 THEN
+                pos = largo
+              ELSE
+                pos = pos + fin
+              END IF
+              col = col + CuentaChars(src, ini, pos)
+              quieto = TRUE
+            quieto = TRUE
+            ELSE
+              IF EsInicioIdent(c) THEN
+                ini = pos
+                iniCol = col
+                WHILE SigueIdent(src, pos, largo)
+                  pos = pos + 1
+                  col = col + 1
+                WEND
+                palabra = MID(src, ini, pos - ini)
+                mayus = Plegar(src, ini, pos, TRUE)
+                IF EsPalabraClave(mayus) THEN
+                  tkTipo[tkN] = "keyword"
+                  tkValor[tkN] = mayus
+                  tkTexto[tkN] = palabra
+                  tkCol[tkN] = iniCol
+                  tkFin[tkN] = col
+                  tkN = tkN + 1
+                ELSE
+                  tkTipo[tkN] = "ident"
+                  tkValor[tkN] = Plegar(src, ini, pos, FALSE)
+                  tkTexto[tkN] = palabra
+                  tkCol[tkN] = iniCol
+                  tkFin[tkN] = col
+                  tkN = tkN + 1
+                END IF
+                quieto = TRUE
+              ELSE
+                IF EsDigito(c) THEN
+                  ini = pos
+                  iniCol = col
+                  WHILE EsDigitoEn(src, pos, largo)
+                    pos = pos + 1
+                    col = col + 1
+                  WEND
+                  coma = FALSE
+                  ' El punto sólo es decimal si no es el acceso a miembro de un
+                  ' entero: "a.1" es un miembro y "1.5" es un flotante.
+                    ' Anidado y no con AND: el límite y el índice en la misma
+                    ' expresión no se cortocircuitan, así que el acceso al
+                    ' dígito va en su propia rama. Un AND que protege un índice
+                    ' tiene que protegerlo en la rama, no en la expresión.
+                    IF ActualEs(src, pos, largo, 46) THEN
+                      IF pos + 1 < largo THEN
+                        IF EsDigito(CHARCODE(src, pos + 1)) THEN
+                          coma = TRUE
+                          pos = pos + 2
+                          col = col + 2
+                          WHILE EsDigitoEn(src, pos, largo)
+                            pos = pos + 1
+                            col = col + 1
+                          WEND
+                        END IF
+                      END IF
+                    END IF
+                  ' Exponente. Si la "e" no va seguida de dígitos no era un
+                  ' exponente, y hay que devolver la posición: en "1e" el uno es
+                  ' un entero y la "e" un identificador.
+                  IF ActualEs(src, pos, largo, 101) OR ActualEs(src, pos, largo, 69) THEN
+                    ojo = pos
+                    ojoCol = col
+                    pos = pos + 1
+                    col = col + 1
+                    IF ActualEs(src, pos, largo, 43) OR ActualEs(src, pos, largo, 45) THEN
+                      pos = pos + 1
+                      col = col + 1
+                    END IF
+                    IF EsDigitoEn(src, pos, largo) THEN
+                      coma = TRUE
+                      WHILE EsDigitoEn(src, pos, largo)
+                        pos = pos + 1
+                        col = col + 1
+                      WEND
+                    ELSE
+                      pos = ojo
+                      col = ojoCol
+                    END IF
+                  END IF
+                  numero = MID(src, ini, pos - ini)
+                  IF coma THEN
+                    tkTipo[tkN] = "float"
+                    tkValor[tkN] = numero
+                    tkTexto[tkN] = numero
+                    tkCol[tkN] = iniCol
+                    tkFin[tkN] = col
+                    tkN = tkN + 1
+                  ELSE
+                    tkTipo[tkN] = "int"
+                    tkValor[tkN] = numero
+                    tkTexto[tkN] = numero
+                    tkCol[tkN] = iniCol
+                    tkFin[tkN] = col
+                    tkN = tkN + 1
+                  END IF
+                  quieto = TRUE
+                ELSE
+                  IF c = 34 THEN
+                    bufCol = col + 1
+                    pos = pos + 1
+                    col = col + 1
+                    abierto = TRUE
+                    vaciaOK = TRUE
+                    quieto = TRUE
+                  ELSE
+                    ' Número con prefijo. Se mira la letra que sigue porque el
+                    ' "&" suelto es el operador de conjunción.
+                    IF ActualEs(src, pos, largo, 38) AND (SiguienteEs(src, pos, largo, 72) OR SiguienteEs(src, pos, largo, 104) OR SiguienteEs(src, pos, largo, 66) OR SiguienteEs(src, pos, largo, 98) OR SiguienteEs(src, pos, largo, 79) OR SiguienteEs(src, pos, largo, 111)) THEN
+                      ini = pos
+                      iniCol = col
+                      pc = CHARCODE(src, pos + 1)
+                      pos = pos + 2
+                      col = col + 2
+                      WHILE EsDigitoPrefijoEn(src, pos, largo, pc)
+                        pos = pos + 1
+                        col = col + 1
+                      WEND
+                      numero = MID(src, ini, pos - ini)
+                      tkTipo[tkN] = "int"
+                      tkValor[tkN] = numero
+                      tkTexto[tkN] = numero
+                      tkCol[tkN] = iniCol
+                      tkFin[tkN] = col
+                      tkN = tkN + 1
+                      quieto = TRUE
+                    ELSE
+                      ' Operador. Sólo hay tres de dos caracteres, <> <= y >=, y
+                      ' el doble igual NO existe: "==" son dos iguales, como en
+                      ' C. Por eso basta con mirar si el carácter es de los tres
+                      ' que pueden empezar uno de dos y qué lo sigue.
+                      doble = FALSE
+                      IF pos + 1 < largo THEN
+                        e = CHARCODE(src, pos + 1)
+                        IF c = 60 THEN
+                          doble = e = 62 OR e = 61
+                        ELSE
+                          IF c = 62 THEN
+                            doble = e = 61
+                          END IF
+                        END IF
+                      END IF
+                      fin = 1
+                      IF doble THEN
+                        fin = 2
+                      END IF
+                      tkTipo[tkN] = "op"
+                      tkValor[tkN] = MID(src, pos, fin)
+                      tkTexto[tkN] = MID(src, pos, fin)
+                      tkCol[tkN] = col
+                      tkFin[tkN] = col + fin
+                      tkN = tkN + 1
+                      pos = pos + fin
+                      col = col + fin
+                      quieto = TRUE
+                    END IF
+                  END IF
+                END IF
+              END IF
+            END IF
+          END IF
+        END IF
+      END IF
+    END IF
+  END IF
+
+  ' Avance por byte y por carácter van juntos: un byte de continuación UTF-8
+  ' avanza el byte y no la columna. Sin esto, las columnas de todo lo que
+  ' venga después de un acento correrían una posición, que es como fallan los
+  ' goldens cuando hay texto no-ASCII.
+  IF NOT quieto THEN
+    ' Un comentario sin salto de línea deja pos en largo, y el avance lo pasa
+    ' a largo + 1. Por eso el byte se lee antes de avanzar y con guarda: leerlo
+    ' después es un índice fuera de rango en el último carácter del fichero, y
+    ' sólo en el último, que es la clase de fallo que sobrevive a los tests
+    ' hasta que alguien compila un programa que no acaba en salto de línea.
+    e = 0
+    IF pos - 1 < largo THEN
+      e = CHARCODE(src, pos - 1)
+    END IF
+    pos = pos + 1
+    IF NOT EsContinuacion(e) THEN
+      col = col + 1
+    END IF
+  END IF
+WEND
+
+tkTipo[tkN] = "eof"
+tkValor[tkN] = ""
+tkTexto[tkN] = ""
+tkCol[tkN] = col
+tkFin[tkN] = col
+tkN = tkN + 1
+IF volcarTokens THEN
+  FOR i = 0 TO tkN - 1
+    PRINT LineaToken(tkCol[i], tkFin[i], tkTipo[i], tkValor[i], tkTexto[i])
+  NEXT i
+  PRINT ""
+  PRINT "; " & STR(tkN) & " token(s)"
+END IF

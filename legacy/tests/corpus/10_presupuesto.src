@@ -1,0 +1,20 @@
+' Un presupuesto mensual, con acumulados: el caso de uso más típico.
+DIM ingresos AS ARRAY OF INTEGER = [3200, 2800, 4100, 3600]
+DIM gastos AS ARRAY OF INTEGER = [2100, 2600, 1900, 3100]
+
+DIM total_ingresos AS INTEGER = 0
+DIM total_gastos AS INTEGER = 0
+
+FOR mes = 0 TO LEN(ingresos) - 1
+    total_ingresos = total_ingresos + ingresos[mes]
+    total_gastos = total_gastos + gastos[mes]
+NEXT mes
+
+PRINT "meses: " & STR(LEN(ingresos))
+PRINT "ingresos: " & STR(total_ingresos)
+PRINT "gastos: " & STR(total_gastos)
+PRINT "saldo: " & STR(total_ingresos - total_gastos)
+
+DIM promedio AS DOUBLE = 0.0
+promedio = total_ingresos \ LEN(ingresos)
+PRINT "promedio mensual: " & STR(promedio)

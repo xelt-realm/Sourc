@@ -1,0 +1,7 @@
+   0 Program          58   104 | body=1
+   1 Arena            59   104 | name=frame body=2
+   2 Dim              73    94 | name=x name_span=77-78 type_ref=3 value=4
+   3 TypeRef          82    89 | name=INTEGER element=-
+   4 IntLit           92    93 | value=1
+
+; 5 nodo(s)

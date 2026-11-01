@@ -1,0 +1,5 @@
+   0 Program          45    54 | body=1
+   1 ColorStmt        46    54 | index=2
+   2 IntLit           52    53 | value=5
+
+; 3 nodo(s)

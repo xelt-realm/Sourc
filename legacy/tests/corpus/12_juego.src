@@ -1,0 +1,25 @@
+' Un bucle de juego completo con entrada de teclado simulada.
+USE SOURCE_2D
+
+SCREEN 320, 240, "prueba"
+
+DIM x AS SINGLE = 32.0
+DIM y AS SINGLE = 32.0
+DIM vx AS SINGLE = 0.0
+DIM frames AS INTEGER = 0
+
+WHILE frames < 4
+    CLS RGB(12, 12, 20)
+    IF KEY("d") THEN vx = vx + 0.5
+    IF KEY("a") THEN vx = vx - 0.5
+    IF vx < -8.0 THEN vx = -8.0
+    IF vx > 8.0 THEN vx = 8.0
+    x = x + vx
+    RECT 0, 0, 320, 240, RGB(12, 12, 20)
+    CIRCLE x, y, 8, RGB(255, 200, 0)
+    FLIP
+    frames = frames + 1
+WEND
+
+PRINT "frames: " & STR(frames)
+PRINT "x final: " & STR(x)

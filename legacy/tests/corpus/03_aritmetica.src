@@ -1,0 +1,12 @@
+' Los operadores, en el orden de la precedencia.
+DIM a AS INTEGER = 17
+DIM b AS INTEGER = 5
+PRINT a + b
+PRINT a - b
+PRINT a * b
+PRINT a DIV b
+PRINT a MOD b
+PRINT a \ b
+PRINT 2.0 ^ 10
+DIM texto AS STRING = "la"
+PRINT texto & " suma"

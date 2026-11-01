@@ -1,0 +1,4 @@
+' ARENA parsea pero no baja a IR (E0044): es de la Fase 4.
+ARENA frame
+  DIM x AS INTEGER = 1
+END ARENA

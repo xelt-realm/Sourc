@@ -1,0 +1,3 @@
+' NIL como literal de expresión.
+DIM n AS STRING = NIL
+PRINT 1

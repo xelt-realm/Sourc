@@ -1,0 +1,51 @@
+' laberinto.src
+' El objetivo de la Fase 3: 2D, entrada de teclado y game loop.
+'
+' Notas de sintaxis:
+'   FOR declara su propia variable, con ambito de bucle (ADR 0002).
+'   Las variables de estado se declaran con DIM, siempre (ADR 0002).
+'   RGB construye un color; COLOR es la sentencia de paleta (ADR 0005).
+'   KEY(k) es "tecla mantenida"; KEYDOWN(k) es el flanco de este frame.
+
+USE SOURCE_2D
+
+SCREEN 640, 480, "Laberinto"
+
+DIM mapa AS ARRAY OF STRING = [
+    "################",
+    "#..............#",
+    "#.####.#####.#.#",
+    "#.#..#.#...#.#.#",
+    "#.#.##.#.#.#.#.#",
+    "#.#....#.#...#.#",
+    "#.######.#####.#",
+    "#..............#",
+    "################"
+]
+
+DIM pared AS COLOR = RGB(40, 40, 60)
+DIM suelo AS COLOR = RGB(12, 12, 20)
+DIM jugador AS COLOR = RGB(255, 200, 0)
+
+DIM px AS SINGLE = 32
+DIM py AS SINGLE = 32
+DIM velocidad AS SINGLE = 3
+
+WHILE true
+    CLS suelo
+
+    FOR fila = 0 TO LEN(mapa) - 1
+        FOR col = 0 TO LEN(mapa[fila]) - 1
+            IF mapa[fila][col] = "#" THEN RECT col * 32, fila * 32, 32, 32, pared
+        NEXT col
+    NEXT fila
+
+    IF KEY("w") THEN py = py - velocidad
+    IF KEY("s") THEN py = py + velocidad
+    IF KEY("a") THEN px = px - velocidad
+    IF KEY("d") THEN px = px + velocidad
+
+    CIRCLE px, py, 8, jugador
+
+    FLIP
+WEND

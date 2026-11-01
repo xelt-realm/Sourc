@@ -1,0 +1,4 @@
+' hola.src
+' El programa más pequeño que significa algo.
+
+PRINT "hola mundo"

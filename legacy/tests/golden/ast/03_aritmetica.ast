@@ -1,0 +1,44 @@
+   0 Program          48   232 | body=1,4,7,11,15,19,23,27,31,35,38
+   1 Dim              49    71 | name=a name_span=53-54 type_ref=2 value=3
+   2 TypeRef          58    65 | name=INTEGER element=-
+   3 IntLit           68    70 | value=17
+   4 Dim              71    92 | name=b name_span=75-76 type_ref=5 value=6
+   5 TypeRef          80    87 | name=INTEGER element=-
+   6 IntLit           90    91 | value=5
+   7 Primitive        92   104 | name=PRINT args=8 inline=0
+   8 Binary           98   103 | op=+ left=9 right=10
+   9 Name             98    99 | value=a
+  10 Name            102   103 | value=b
+  11 Primitive       104   116 | name=PRINT args=12 inline=0
+  12 Binary          110   115 | op=- left=13 right=14
+  13 Name            110   111 | value=a
+  14 Name            114   115 | value=b
+  15 Primitive       116   128 | name=PRINT args=16 inline=0
+  16 Binary          122   127 | op=* left=17 right=18
+  17 Name            122   123 | value=a
+  18 Name            126   127 | value=b
+  19 Primitive       128   142 | name=PRINT args=20 inline=0
+  20 Binary          134   141 | op=DIV left=21 right=22
+  21 Name            134   135 | value=a
+  22 Name            140   141 | value=b
+  23 Primitive       142   156 | name=PRINT args=24 inline=0
+  24 Binary          148   155 | op=MOD left=25 right=26
+  25 Name            148   149 | value=a
+  26 Name            154   155 | value=b
+  27 Primitive       156   168 | name=PRINT args=28 inline=0
+  28 Binary          162   167 | op=\\ left=29 right=30
+  29 Name            162   163 | value=a
+  30 Name            166   167 | value=b
+  31 Primitive       168   183 | name=PRINT args=32 inline=0
+  32 Binary          174   182 | op=^ left=33 right=34
+  33 FloatLit        174   177 | value=2.0
+  34 IntLit          180   182 | value=10
+  35 Dim             183   210 | name=texto name_span=187-192 type_ref=36 value=37
+  36 TypeRef         196   202 | name=STRING element=-
+  37 StringLit       206   209 | value=la
+  38 Primitive       210   232 | name=PRINT args=39 inline=0
+  39 Binary          216   231 | op=& left=40 right=41
+  40 Name            216   221 | value=texto
+  41 StringLit       225   231 | value= suma
+
+; 42 nodo(s)

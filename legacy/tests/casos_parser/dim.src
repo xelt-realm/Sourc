@@ -1,0 +1,11 @@
+' DIM: con tipo, con tipo y valor, y array con NEW.
+' Las expresiones de 2a son hojas: un literal o un nombre. El `3` de
+' `NEW INTEGER[3]` es un `IntLit`, que es una hoja, así que sí entra.
+Dim a As Integer = 7
+Dim b As Single = 1.5
+Dim c As String = "texto"
+Dim d As Boolean = TRUE
+Dim e As Integer = 0
+Dim f As Array Of Integer = New Integer[3]
+Dim g As Array Of String = New String[2]
+PRINT a; b; c; d; e

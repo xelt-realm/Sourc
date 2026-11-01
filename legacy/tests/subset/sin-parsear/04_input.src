@@ -1,0 +1,8 @@
+' INPUT está en GRAMMAR §5 y el typechecker tiene su checker, pero **no parsea**:
+' `INPUT x` falla con "final de sentencia inesperado". Es documentación que
+' promete una primitiva que no existe, y por eso está aquí: el día que se
+' implemente, el gate tiene que decidir si el compilador puede usarla.
+
+DIM respuesta AS STRING = ""
+INPUT respuesta
+PRINT respuesta

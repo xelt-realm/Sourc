@@ -1,0 +1,4 @@
+hola mundo
+calculado: 7
+anidado: mundo x 3
+literal: {corchetes}

@@ -1,0 +1,18 @@
+   0 Program          47   114 | body=1,4,7,10,13
+   1 Dim              48    69 | name=a name_span=52-53 type_ref=2 value=3
+   2 TypeRef          57    64 | name=INTEGER element=-
+   3 IntLit           67    68 | value=0
+   4 Dim              69    90 | name=b name_span=73-74 type_ref=5 value=6
+   5 TypeRef          78    85 | name=INTEGER element=-
+   6 IntLit           88    89 | value=9
+   7 Assign           90    97 | target=8 value=9
+   8 Name             90    91 | value=a
+   9 IntLit           94    96 | value=12
+  10 Assign           97   103 | target=11 value=12
+  11 Name             97    98 | value=b
+  12 Name            101   102 | value=a
+  13 Primitive       103   114 | name=PRINT args=14,15 inline=1
+  14 Name            109   110 | value=a
+  15 Name            112   113 | value=b
+
+; 16 nodo(s)

@@ -1,0 +1,10 @@
+' GOTO parsea y no baja a IR. Mismo caso que ARENA: el gate lo rechaza por
+'政策 de subconjunto, no por un error de lowering.
+
+DIM i AS INTEGER = 0
+inicio:
+i = i + 1
+IF i < 3 THEN
+  GOTO inicio
+END IF
+PRINT i

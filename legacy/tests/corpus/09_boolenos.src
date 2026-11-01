@@ -1,0 +1,13 @@
+' Booleanos y operadores lógicos.
+DIM a AS BOOLEAN = TRUE
+DIM b AS BOOLEAN = FALSE
+PRINT a
+PRINT b
+PRINT NOT a
+PRINT a AND b
+PRINT a OR b
+PRINT a XOR b
+DIM n AS INTEGER = 10
+IF n > 5 AND n < 20 THEN PRINT "dentro"
+IF n < 5 OR n > 20 THEN PRINT "fuera"
+IF NOT (n = 10) THEN PRINT "diez no es diez"

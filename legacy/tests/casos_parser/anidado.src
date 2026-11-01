@@ -1,0 +1,15 @@
+' Cuerpos anidados, que es lo que prueba la pila y su disciplina.
+' Tres niveles de anidación distintos en un solo programa, porque la pila se
+' abre por tres caminos: un cuerpo nuevo, un `ELSE`, y el cierre.
+Dim i As Integer = 0
+Dim dos As Boolean = TRUE
+FOR i = 0 TO 1
+  IF dos THEN
+    PRINT "dentro"
+  ELSE
+    PRINT "fuera"
+  END IF
+  WHILE FALSE
+    PRINT "nunca"
+  WEND
+NEXT i

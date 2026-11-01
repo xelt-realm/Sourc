@@ -1,0 +1,30 @@
+# Artefactos
+dist/
+.wrangler/
+*.sir
+*.wasm
+*.js.map
+/sourc
+/main.c
+*.ssa
+*.s
+app
+
+# ...pero los goldens de IR **sí** se versionan: son el juez del bootstrap
+# (ADR 0016), y un fichero de gate que sólo existe en la máquina de quien lo
+# generó no es un gate. `*.sir` de arriba es para el IR que produce un build.
+!tests/golden/ir/*.sir
+
+# Legacy Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Sistema
+.DS_Store
+Thumbs.db

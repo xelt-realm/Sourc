@@ -1,0 +1,14 @@
+' Todo lo que se puede hacer con un texto.
+DIM s AS STRING = "hola mundo"
+PRINT LEN(s)
+PRINT LENU(s)
+PRINT CHARCODE(s, 0)
+PRINT LEFT(s, 4)
+PRINT RIGHT(s, 5)
+PRINT MID(s, 6, 5)
+PRINT CONCAT(s, "!")
+PRINT CONTAINS(s, "mundo")
+PRINT INDEXOF(s, "mundo")
+PRINT VAL("42") + 1
+PRINT s[0]
+PRINT STR(LEN("ñ"))

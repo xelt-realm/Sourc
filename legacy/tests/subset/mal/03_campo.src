@@ -1,0 +1,11 @@
+' El acceso a campo (`a.b`) sí parsea, y el typechecker lo rechaza con E0025.
+' Lo que se comprueba aquí es que el gate lo ve ANTES que el typechecker:
+' para quien escribe el compilador la noticia útil es "está por encima de tu
+' nivel", no "no está implementado".
+
+' No hace falta un struct real para que el nodo exista. Un literal con campo
+' produce el mismo `ast.Field`, y un fixture que dependiera de `STRUCT` no
+' llegaría nunca al gate, porque `STRUCT` no parsea (ver `sin-parsear/`).
+
+DIM n AS INTEGER = 1
+PRINT n.campo

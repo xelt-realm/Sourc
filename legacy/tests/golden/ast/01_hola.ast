@@ -1,0 +1,5 @@
+   0 Program          45    65 | body=1
+   1 Primitive        46    65 | name=PRINT args=2 inline=0
+   2 StringLit        53    64 | value=hola mundo
+
+; 3 nodo(s)

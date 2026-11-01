@@ -1,0 +1,256 @@
+  15    16 newline       \n | \n
+  79    80 newline       \n | \n
+  81    82 newline       \n | \n
+ 102   103 newline       \n | \n
+ 170   171 newline       \n | \n
+ 239   240 newline       \n | \n
+ 311   312 newline       \n | \n
+ 383   384 newline       \n | \n
+ 384   385 newline       \n | \n
+ 385   388 keyword       USE | USE
+ 389   398 ident         source_2d | SOURCE_2D
+ 398   399 newline       \n | \n
+ 399   400 newline       \n | \n
+ 400   406 keyword       SCREEN | SCREEN
+ 407   410 int           640 | 640
+ 410   411 op            , | ,
+ 412   415 int           480 | 480
+ 415   416 op            , | ,
+ 418   428 string        Laberinto | Laberinto
+ 428   429 newline       \n | \n
+ 429   430 newline       \n | \n
+ 430   433 keyword       DIM | DIM
+ 434   438 ident         mapa | mapa
+ 439   441 keyword       AS | AS
+ 442   447 keyword       ARRAY | ARRAY
+ 448   450 keyword       OF | OF
+ 451   457 keyword       STRING | STRING
+ 458   459 op            = | =
+ 460   461 op            [ | [
+ 461   462 newline       \n | \n
+ 467   484 string        ################ | ################
+ 484   485 op            , | ,
+ 485   486 newline       \n | \n
+ 491   508 string        #..............# | #..............#
+ 508   509 op            , | ,
+ 509   510 newline       \n | \n
+ 515   532 string        #.####.#####.#.# | #.####.#####.#.#
+ 532   533 op            , | ,
+ 533   534 newline       \n | \n
+ 539   556 string        #.#..#.#...#.#.# | #.#..#.#...#.#.#
+ 556   557 op            , | ,
+ 557   558 newline       \n | \n
+ 563   580 string        #.#.##.#.#.#.#.# | #.#.##.#.#.#.#.#
+ 580   581 op            , | ,
+ 581   582 newline       \n | \n
+ 587   604 string        #.#....#.#...#.# | #.#....#.#...#.#
+ 604   605 op            , | ,
+ 605   606 newline       \n | \n
+ 611   628 string        #.######.#####.# | #.######.#####.#
+ 628   629 op            , | ,
+ 629   630 newline       \n | \n
+ 635   652 string        #..............# | #..............#
+ 652   653 op            , | ,
+ 653   654 newline       \n | \n
+ 659   676 string        ################ | ################
+ 676   677 newline       \n | \n
+ 677   678 op            ] | ]
+ 678   679 newline       \n | \n
+ 679   680 newline       \n | \n
+ 680   683 keyword       DIM | DIM
+ 684   689 ident         pared | pared
+ 690   692 keyword       AS | AS
+ 693   698 keyword       COLOR | COLOR
+ 699   700 op            = | =
+ 701   704 ident         rgb | RGB
+ 704   705 op            ( | (
+ 705   707 int           40 | 40
+ 707   708 op            , | ,
+ 709   711 int           40 | 40
+ 711   712 op            , | ,
+ 713   715 int           60 | 60
+ 715   716 op            ) | )
+ 716   717 newline       \n | \n
+ 717   720 keyword       DIM | DIM
+ 721   726 ident         suelo | suelo
+ 727   729 keyword       AS | AS
+ 730   735 keyword       COLOR | COLOR
+ 736   737 op            = | =
+ 738   741 ident         rgb | RGB
+ 741   742 op            ( | (
+ 742   744 int           12 | 12
+ 744   745 op            , | ,
+ 746   748 int           12 | 12
+ 748   749 op            , | ,
+ 750   752 int           20 | 20
+ 752   753 op            ) | )
+ 753   754 newline       \n | \n
+ 754   757 keyword       DIM | DIM
+ 758   765 ident         jugador | jugador
+ 766   768 keyword       AS | AS
+ 769   774 keyword       COLOR | COLOR
+ 775   776 op            = | =
+ 777   780 ident         rgb | RGB
+ 780   781 op            ( | (
+ 781   784 int           255 | 255
+ 784   785 op            , | ,
+ 786   789 int           200 | 200
+ 789   790 op            , | ,
+ 791   792 int           0 | 0
+ 792   793 op            ) | )
+ 793   794 newline       \n | \n
+ 794   795 newline       \n | \n
+ 795   798 keyword       DIM | DIM
+ 799   801 ident         px | px
+ 802   804 keyword       AS | AS
+ 805   811 keyword       SINGLE | SINGLE
+ 812   813 op            = | =
+ 814   816 int           32 | 32
+ 816   817 newline       \n | \n
+ 817   820 keyword       DIM | DIM
+ 821   823 ident         py | py
+ 824   826 keyword       AS | AS
+ 827   833 keyword       SINGLE | SINGLE
+ 834   835 op            = | =
+ 836   838 int           32 | 32
+ 838   839 newline       \n | \n
+ 839   842 keyword       DIM | DIM
+ 843   852 ident         velocidad | velocidad
+ 853   855 keyword       AS | AS
+ 856   862 keyword       SINGLE | SINGLE
+ 863   864 op            = | =
+ 865   866 int           3 | 3
+ 866   867 newline       \n | \n
+ 867   868 newline       \n | \n
+ 868   873 keyword       WHILE | WHILE
+ 874   878 keyword       TRUE | true
+ 878   879 newline       \n | \n
+ 883   886 keyword       CLS | CLS
+ 887   892 ident         suelo | suelo
+ 892   893 newline       \n | \n
+ 893   894 newline       \n | \n
+ 898   901 keyword       FOR | FOR
+ 902   906 ident         fila | fila
+ 907   908 op            = | =
+ 909   910 int           0 | 0
+ 911   913 keyword       TO | TO
+ 914   917 ident         len | LEN
+ 917   918 op            ( | (
+ 918   922 ident         mapa | mapa
+ 922   923 op            ) | )
+ 924   925 op            - | -
+ 926   927 int           1 | 1
+ 927   928 newline       \n | \n
+ 936   939 keyword       FOR | FOR
+ 940   943 ident         col | col
+ 944   945 op            = | =
+ 946   947 int           0 | 0
+ 948   950 keyword       TO | TO
+ 951   954 ident         len | LEN
+ 954   955 op            ( | (
+ 955   959 ident         mapa | mapa
+ 959   960 op            [ | [
+ 960   964 ident         fila | fila
+ 964   965 op            ] | ]
+ 965   966 op            ) | )
+ 967   968 op            - | -
+ 969   970 int           1 | 1
+ 970   971 newline       \n | \n
+ 983   985 keyword       IF | IF
+ 986   990 ident         mapa | mapa
+ 990   991 op            [ | [
+ 991   995 ident         fila | fila
+ 995   996 op            ] | ]
+ 996   997 op            [ | [
+ 997  1000 ident         col | col
+1000  1001 op            ] | ]
+1002  1003 op            = | =
+1005  1007 string        # | #
+1008  1012 keyword       THEN | THEN
+1013  1017 keyword       RECT | RECT
+1018  1021 ident         col | col
+1022  1023 op            * | *
+1024  1026 int           32 | 32
+1026  1027 op            , | ,
+1028  1032 ident         fila | fila
+1033  1034 op            * | *
+1035  1037 int           32 | 32
+1037  1038 op            , | ,
+1039  1041 int           32 | 32
+1041  1042 op            , | ,
+1043  1045 int           32 | 32
+1045  1046 op            , | ,
+1047  1052 ident         pared | pared
+1052  1053 newline       \n | \n
+1061  1065 keyword       NEXT | NEXT
+1066  1069 ident         col | col
+1069  1070 newline       \n | \n
+1074  1078 keyword       NEXT | NEXT
+1079  1083 ident         fila | fila
+1083  1084 newline       \n | \n
+1084  1085 newline       \n | \n
+1089  1091 keyword       IF | IF
+1092  1095 ident         key | KEY
+1095  1096 op            ( | (
+1097  1099 string        w | w
+1099  1100 op            ) | )
+1101  1105 keyword       THEN | THEN
+1106  1108 ident         py | py
+1109  1110 op            = | =
+1111  1113 ident         py | py
+1114  1115 op            - | -
+1116  1125 ident         velocidad | velocidad
+1125  1126 newline       \n | \n
+1130  1132 keyword       IF | IF
+1133  1136 ident         key | KEY
+1136  1137 op            ( | (
+1138  1140 string        s | s
+1140  1141 op            ) | )
+1142  1146 keyword       THEN | THEN
+1147  1149 ident         py | py
+1150  1151 op            = | =
+1152  1154 ident         py | py
+1155  1156 op            + | +
+1157  1166 ident         velocidad | velocidad
+1166  1167 newline       \n | \n
+1171  1173 keyword       IF | IF
+1174  1177 ident         key | KEY
+1177  1178 op            ( | (
+1179  1181 string        a | a
+1181  1182 op            ) | )
+1183  1187 keyword       THEN | THEN
+1188  1190 ident         px | px
+1191  1192 op            = | =
+1193  1195 ident         px | px
+1196  1197 op            - | -
+1198  1207 ident         velocidad | velocidad
+1207  1208 newline       \n | \n
+1212  1214 keyword       IF | IF
+1215  1218 ident         key | KEY
+1218  1219 op            ( | (
+1220  1222 string        d | d
+1222  1223 op            ) | )
+1224  1228 keyword       THEN | THEN
+1229  1231 ident         px | px
+1232  1233 op            = | =
+1234  1236 ident         px | px
+1237  1238 op            + | +
+1239  1248 ident         velocidad | velocidad
+1248  1249 newline       \n | \n
+1249  1250 newline       \n | \n
+1254  1260 keyword       CIRCLE | CIRCLE
+1261  1263 ident         px | px
+1263  1264 op            , | ,
+1265  1267 ident         py | py
+1267  1268 op            , | ,
+1269  1270 int           8 | 8
+1270  1271 op            , | ,
+1272  1279 ident         jugador | jugador
+1279  1280 newline       \n | \n
+1280  1281 newline       \n | \n
+1285  1289 keyword       FLIP | FLIP
+1289  1290 newline       \n | \n
+1290  1294 keyword       WEND | WEND
+1294  1294 eof            | 
+
+; 254 token(s)

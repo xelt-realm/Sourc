@@ -1,0 +1,8 @@
+   0 Program          32    63 | body=1,4
+   1 Dim              33    55 | name=n name_span=37-38 type_ref=2 value=3
+   2 TypeRef          42    48 | name=STRING element=-
+   3 NilLit           51    54 | 
+   4 Primitive        55    63 | name=PRINT args=5 inline=0
+   5 IntLit           61    62 | value=1
+
+; 6 nodo(s)

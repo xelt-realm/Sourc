@@ -1,0 +1,34 @@
+' Funciones, recursión, y el paso de valores.
+
+FUNCTION doble(x AS INTEGER) AS INTEGER
+  RETURN x * 2
+END FUNCTION
+
+FUNCTION factorial(n AS INTEGER) AS DOUBLE
+  IF n <= 1 THEN
+    RETURN 1.0
+  END IF
+  RETURN n * factorial(n - 1)
+END FUNCTION
+
+' Una función sin tipo de retorno no devuelve nada, y se puede usar como
+' sentencia. Es la diferencia entre `RETURN` con valor y sin él.
+FUNCTION avisa(texto AS STRING)
+  PRINT texto
+END FUNCTION
+
+FUNCTION nada() AS INTEGER
+END FUNCTION
+
+PRINT doble(21)
+PRINT factorial(6)
+avisa("hola")
+PRINT nada()
+
+' Los parámetros y las variables locales viven en su propio ámbito (ADR 0002).
+FUNCTION sombrea(x AS INTEGER) AS INTEGER
+  DIM y AS INTEGER = x
+  DIM x AS INTEGER = 99
+  RETURN y + x
+END FUNCTION
+PRINT sombrea(1)

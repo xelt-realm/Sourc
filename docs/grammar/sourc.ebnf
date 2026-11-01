@@ -1,0 +1,147 @@
+(* Source 1.0 — fuente de verdad de la sintaxis.
+   La semántica de cada construcción está en GRAMMAR.md.
+   Test de conformidad: tools/testharness.py::test_grammar_docs *)
+
+program         = { statement } EOF ;
+
+(* ---------- sentencias ---------- *)
+
+statement       = use_stmt
+                | import_stmt
+                | dim_stmt
+                | type_decl
+                | assign_stmt
+                | if_stmt
+                | while_stmt
+                | for_stmt
+                | goto_stmt
+                | gosub_stmt
+                | return_stmt
+                | function_decl
+                | arena_stmt
+                | label_stmt
+                | primitive_stmt ;
+
+use_stmt        = "USE" runtime_module ;
+import_stmt     = "IMPORT" "FROM" string [ "AS" ident ] ;
+runtime_module  = "SOURCE_CORE" | "SOURCE_2D" | "SOURCE_3D"
+                | "SOURCE_WEB" | "SOURCE_SOUND" | "SOURCE_NET" ;
+
+dim_stmt        = "DIM" ident [ "AS" type_ref ] [ "=" expr ] ;
+type_ref        = prim_type | array_type | struct_type | func_type | ident ;
+prim_type       = "INTEGER" | "SINGLE" | "DOUBLE" | "STRING" | "BOOLEAN"
+                | "COLOR" ;
+array_type      = "ARRAY" "OF" type_ref ;
+struct_type     = "STRUCT" ident ;
+type_decl       = "TYPE" ident NL { field_decl } "END" ;
+field_decl      = ident ":" type_ref NL ;
+func_type       = "FUNCTION" "(" [ type_ref { "," type_ref } ] ")"
+                          [ "->" type_ref ] ;
+
+assign_stmt     = postfix "=" expr ;
+
+if_stmt         = "IF" expr "THEN" ( inline_body | block ) ;
+inline_body     = statement ;
+block           = NL { statement } [ else_clause ] "END" "IF" ;
+else_clause     = "ELSE" ( inline_body | { statement } ) ;
+
+while_stmt      = "WHILE" expr NL { statement } "WEND" ;
+
+for_stmt        = "FOR" ident "=" expr "TO" expr [ "STEP" expr ] NL
+                  { statement } "NEXT" [ ident ] ;
+
+goto_stmt       = "GOTO" label ;
+gosub_stmt      = "GOSUB" label ;
+label_stmt      = label ":" ;
+label           = ident ;
+return_stmt     = "RETURN" [ expr ] ;
+
+arena_stmt      = "ARENA" ident NL { statement } "END" "ARENA" ;
+
+function_decl   = "FUNCTION" ident [ "(" [ param { "," param } ] ")" ]
+                  [ "AS" type_ref ] NL { statement } "END" "FUNCTION" ;
+param           = ident [ "AS" type_ref ] ;
+
+primitive_stmt  = "PRINT" print_args
+                | "SCREEN" screen_args
+                | "SCREEN" "OFF"
+                | "CLS" [ expr ]
+                | "PSET" expr "," expr [ "," expr ]
+                | "LINE" expr "," expr "," expr "," expr [ "," expr ]
+                | "RECT" [ "FILLED" ] expr "," expr "," expr "," expr
+                           [ "," expr ]
+                | "CIRCLE" expr "," expr "," expr [ "," expr ]
+                | "TRIANGLE" expr "," expr "," expr "," expr "," expr
+                            [ "," expr ]
+                | "TEXT" expr "," expr "," string [ "," expr ]
+                | "FLIP"
+                | "COLOR" expr
+                | "INPUT" ident
+                | "SET" ident "=" expr ;
+
+print_args      = expr { "," expr } ;
+screen_args     = expr "," expr [ "," string ] ;
+
+(* ---------- capa web (modo PAGE) ---------- *)
+
+page_stmt       = "PAGE" string NL [ head ] [ body ] "END" "PAGE" ;
+head            = "HEAD" NL { head_item } "END" "HEAD" ;
+head_item       = "LINK" string
+                | "SCRIPT" string [ "ASYNC" | "DEFER" ]
+                | "META" "name" string "content" string
+                | "STYLE" string
+                | "INCLUDE" "HTML" string ;
+body            = "BODY" NL { body_item } "END" "BODY" ;
+body_item       = heading | paragraph | button | input | list | text
+                | canvas | div | primitive_stmt ;
+heading         = ( "H1" | "H2" ) string ;
+paragraph       = "P" string ;
+button          = "BUTTON" string ( "ON" "CLICK" ident )? ;
+input           = "INPUT" string ( "ON" "ENTER" ident | "ON" "INPUT" ident )? ;
+list            = "LIST" ident ;
+text            = "TEXT" ident ;
+canvas          = "CANVAS" ;
+div             = "DIV" ident string ;
+
+(* ---------- expresiones ---------- *)
+
+expr            = or_expr ;
+or_expr         = and_expr { "OR" and_expr } ;
+and_expr        = xor_expr { "AND" xor_expr } ;
+xor_expr        = rel_expr { "XOR" rel_expr } ;
+rel_expr        = add_expr [ ( "=" | "<>" | "<" | "<=" | ">" | ">=" ) add_expr ] ;
+add_expr        = mul_expr { ( "+" | "-" | "&" ) mul_expr } ;
+mul_expr        = unary_expr { ( "*" | "/" | "\" | "MOD" | "DIV" ) unary_expr } ;
+unary_expr      = ( "-" | "NOT" ) unary_expr | power_expr ;
+power_expr      = postfix [ "^" unary_expr ] ;
+
+postfix         = primary { "." ident | "[" expr "]" | "(" [ args ] ")" } ;
+primary         = number | string | "TRUE" | "FALSE" | "NIL"
+                | ident | "(" expr ")" | array_literal | new_expr ;
+array_literal   = "[" [ expr { "," expr } ] "]" ;
+new_expr        = "NEW" prim_type "[" expr "]" ;
+args            = expr { "," expr } ;
+
+(* ---------- léxico ---------- *)
+
+ident           = letter { letter | digit } ;
+label           = ident ;
+number          = decimal | hex | bin | oct ;
+decimal         = digit { digit } [ "." digit { digit } ]
+                        [ ( "e" | "E" ) [ "+" | "-" ] digit { digit } ] ;
+hex             = "&H" hex_digit { hex_digit } ;
+bin             = "&B" bin_digit { bin_digit } ;
+oct             = "&O" oct_digit { oct_digit } ;
+string          = '"' { char | escape | interpolation } '"' ;
+interpolation   = "{" { char | escape } "}" ;
+escape          = "\\" ( "n" | "t" | "r" | "0" | "\\" | "\"" | "'"
+                      | "u" "{" hex_digit { hex_digit } "}" ) ;
+
+letter          = "A".."Z" | "a".."z" | "_" ;
+digit           = "0".."9" ;
+hex_digit       = digit | "A".."F" | "a".."f" ;
+bin_digit       = "0" | "1" ;
+oct_digit       = "0".."7" ;
+char            = ? cualquier carácter que no sea '"', '\' o salto de línea ? ;
+NL              = salto de línea ;
+NL_or_SEMI     = NL | ";" ;

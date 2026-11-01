@@ -1,0 +1,64 @@
+   0 Program          56   406 | body=1,4,10,24,27,35,37,44,47
+   1 Dim              57    78 | name=x name_span=61-62 type_ref=2 value=3
+   2 TypeRef          66    73 | name=INTEGER element=-
+   3 IntLit           76    77 | value=2
+   4 If               78   104 | condition=5 then_body=8 else_body=- one_liner=1
+   5 Binary           81    86 | op== left=6 right=7
+   6 Name             81    82 | value=x
+   7 IntLit           85    86 | value=1
+   8 Primitive        92   104 | name=PRINT args=9 inline=0
+   9 StringLit        99   103 | value=uno
+  10 If              104   199 | condition=11 then_body=14 else_body=16 one_liner=0
+  11 Binary          107   112 | op== left=12 right=13
+  12 Name            107   108 | value=x
+  13 IntLit          111   112 | value=2
+  14 Primitive       122   134 | name=PRINT args=15 inline=0
+  15 StringLit       129   133 | value=dos
+  16 If              139   192 | condition=17 then_body=20 else_body=22 one_liner=0
+  17 Binary          142   147 | op== left=18 right=19
+  18 Name            142   143 | value=x
+  19 IntLit          146   147 | value=3
+  20 Primitive       157   170 | name=PRINT args=21 inline=0
+  21 StringLit       164   169 | value=tres
+  22 Primitive       179   192 | name=PRINT args=23 inline=0
+  23 StringLit       186   191 | value=otro
+  24 Dim             200   225 | name=total name_span=204-209 type_ref=25 value=26
+  25 TypeRef         213   220 | name=INTEGER element=-
+  26 IntLit          223   224 | value=0
+  27 For             225   269 | var=i var_span=229-230 start=28 stop=29 step=- body=30
+  28 IntLit          233   234 | value=1
+  29 IntLit          238   239 | value=5
+  30 Assign          244   262 | target=31 value=32
+  31 Name            244   249 | value=total
+  32 Binary          252   261 | op=+ left=33 right=34
+  33 Name            252   257 | value=total
+  34 Name            260   261 | value=i
+  35 Primitive       269   281 | name=PRINT args=36 inline=0
+  36 Name            275   280 | value=total
+  37 For             282   324 | var=i var_span=286-287 start=38 stop=39 step=40 body=42
+  38 IntLit          290   291 | value=3
+  39 IntLit          295   296 | value=1
+  40 Unary           302   304 | op=- operand=41
+  41 IntLit          303   304 | value=1
+  42 Primitive       309   317 | name=PRINT args=43 inline=0
+  43 Name            315   316 | value=i
+  44 Dim             325   346 | name=j name_span=329-330 type_ref=45 value=46
+  45 TypeRef         334   341 | name=INTEGER element=-
+  46 IntLit          344   345 | value=0
+  47 While           346   406 | condition=48 body=51,57
+  48 Binary          352   357 | op=< left=49 right=50
+  49 Name            352   353 | value=j
+  50 IntLit          356   357 | value=3
+  51 Primitive       362   387 | name=PRINT args=52 inline=0
+  52 Binary          369   386 | op=& left=53 right=54
+  53 StringLit       369   377 | value=vuelta 
+  54 Call            380   386 | callee=55 args=56
+  55 Name            380   383 | value=str
+  56 Name            384   385 | value=j
+  57 Assign          391   401 | target=58 value=59
+  58 Name            391   392 | value=j
+  59 Binary          395   400 | op=+ left=60 right=61
+  60 Name            395   396 | value=j
+  61 IntLit          399   400 | value=1
+
+; 62 nodo(s)

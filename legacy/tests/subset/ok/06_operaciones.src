@@ -1,0 +1,31 @@
+' Aritmética, booleanos y las funciones matemáticas.
+
+DIM i AS INTEGER = 7
+DIM j AS INTEGER = 3
+PRINT i + j; " "; i - j; " "; i * j
+PRINT i / j
+PRINT i \ j
+PRINT i DIV j
+PRINT i MOD j
+PRINT -i
+PRINT i ^ 2
+
+' Los flotantes promocionan: `/` es división verdadera y siempre da DOUBLE.
+PRINT 1 / 2
+PRINT 1.5 + 1
+
+DIM a AS BOOLEAN = TRUE
+DIM b AS BOOLEAN = FALSE
+PRINT a AND b
+PRINT a OR b
+PRINT NOT a
+PRINT a = b
+PRINT i > j
+
+PRINT ABS(-4)
+PRINT MIN(3, 9)
+PRINT MAX(3, 9)
+PRINT CLAMP(20, 0, 10)
+PRINT SQRT(16.0)
+PRINT FLOOR(2.7)
+PRINT SIN(0.0) + COS(0.0)

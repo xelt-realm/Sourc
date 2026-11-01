@@ -1,0 +1,77 @@
+   0 Program          39   500 | body=1,18,37,56,61,66,71
+   1 FunctionDecl     40   159 | name=mcd params=a:2,b:3 return_type=4 body=5,11
+   2 TypeRef          58    65 | name=INTEGER element=-
+   3 TypeRef          72    79 | name=INTEGER element=-
+   4 TypeRef          84    91 | name=INTEGER element=-
+   5 If               96   119 | condition=6 then_body=9 else_body=- one_liner=1
+   6 Binary           99   104 | op== left=7 right=8
+   7 Name             99   100 | value=b
+   8 IntLit          103   104 | value=0
+   9 Return          110   119 | value=10
+  10 Name            117   118 | value=a
+  11 Return          123   146 | value=12
+  12 Call            130   145 | callee=13 args=14,15
+  13 Name            130   133 | value=mcd
+  14 Name            134   135 | value=b
+  15 Binary          137   144 | op=MOD left=16 right=17
+  16 Name            137   138 | value=a
+  17 Name            143   144 | value=b
+  18 FunctionDecl    160   306 | name=potencia params=base:19,exp:20 return_type=21 body=22,28
+  19 TypeRef         186   193 | name=INTEGER element=-
+  20 TypeRef         202   209 | name=INTEGER element=-
+  21 TypeRef         214   221 | name=INTEGER element=-
+  22 If              226   251 | condition=23 then_body=26 else_body=- one_liner=1
+  23 Binary          229   236 | op== left=24 right=25
+  24 Name            229   232 | value=exp
+  25 IntLit          235   236 | value=0
+  26 Return          242   251 | value=27
+  27 IntLit          249   250 | value=1
+  28 Return          255   293 | value=29
+  29 Binary          262   292 | op=* left=30 right=31
+  30 Name            262   266 | value=base
+  31 Call            269   292 | callee=32 args=33,34
+  32 Name            269   277 | value=potencia
+  33 Name            278   282 | value=base
+  34 Binary          284   291 | op=- left=35 right=36
+  35 Name            284   287 | value=exp
+  36 IntLit          290   291 | value=1
+  37 FunctionDecl    307   420 | name=serie params=n:38 return_type=39 body=40,46
+  38 TypeRef         327   334 | name=INTEGER element=-
+  39 TypeRef         339   346 | name=INTEGER element=-
+  40 If              351   374 | condition=41 then_body=44 else_body=- one_liner=1
+  41 Binary          354   359 | op=< left=42 right=43
+  42 Name            354   355 | value=n
+  43 IntLit          358   359 | value=1
+  44 Return          365   374 | value=45
+  45 IntLit          372   373 | value=0
+  46 Return          378   407 | value=47
+  47 Binary          385   406 | op=+ left=48 right=51
+  48 Binary          385   391 | op=* left=49 right=50
+  49 Name            385   386 | value=n
+  50 IntLit          389   391 | value=10
+  51 Call            394   406 | callee=52 args=53
+  52 Name            394   399 | value=serie
+  53 Binary          400   405 | op=- left=54 right=55
+  54 Name            400   401 | value=n
+  55 IntLit          404   405 | value=1
+  56 Primitive       421   442 | name=PRINT args=57 inline=0
+  57 Call            427   441 | callee=58 args=59,60
+  58 Name            427   430 | value=mcd
+  59 IntLit          431   435 | value=1071
+  60 IntLit          437   440 | value=462
+  61 Primitive       442   464 | name=PRINT args=62 inline=0
+  62 Call            448   463 | callee=63 args=64,65
+  63 Name            448   456 | value=potencia
+  64 IntLit          457   458 | value=2
+  65 IntLit          460   462 | value=10
+  66 Primitive       464   485 | name=PRINT args=67 inline=0
+  67 Call            470   484 | callee=68 args=69,70
+  68 Name            470   478 | value=potencia
+  69 IntLit          479   480 | value=3
+  70 IntLit          482   483 | value=4
+  71 Primitive       485   500 | name=PRINT args=72 inline=0
+  72 Call            491   499 | callee=73 args=74
+  73 Name            491   496 | value=serie
+  74 IntLit          497   498 | value=4
+
+; 75 nodo(s)

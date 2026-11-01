@@ -1,0 +1,69 @@
+   0 Program          56  1731 | body=1,4,7,10,17,20,23,26,29,32,35,43,48,52,62,65
+   1 Dim            1049  1078 | name=entero name_span=1053-1059 type_ref=2 value=3
+   2 TypeRef        1063  1070 | name=INTEGER element=-
+   3 IntLit         1073  1077 | value=&HFF
+   4 Dim            1078  1110 | name=binario name_span=1082-1089 type_ref=5 value=6
+   5 TypeRef        1093  1100 | name=INTEGER element=-
+   6 IntLit         1103  1109 | value=&B1010
+   7 Dim            1110  1138 | name=octal name_span=1114-1119 type_ref=8 value=9
+   8 TypeRef        1123  1130 | name=INTEGER element=-
+   9 IntLit         1133  1137 | value=&O17
+  10 Dim            1138  1178 | name=mixto name_span=1142-1147 type_ref=11 value=12
+  11 TypeRef        1151  1158 | name=INTEGER element=-
+  12 Binary         1161  1177 | op=+ left=13 right=16
+  13 Binary         1161  1171 | op=+ left=14 right=15
+  14 IntLit         1161  1165 | value=&h10
+  15 IntLit         1168  1171 | value=&b1
+  16 IntLit         1174  1177 | value=&o1
+  17 Dim            1178  1210 | name=exponente name_span=1182-1191 type_ref=18 value=19
+  18 TypeRef        1195  1201 | name=SINGLE element=-
+  19 FloatLit       1204  1209 | value=1.5e3
+  20 Dim            1210  1236 | name=otro name_span=1214-1218 type_ref=21 value=22
+  21 TypeRef        1222  1228 | name=SINGLE element=-
+  22 FloatLit       1231  1235 | value=2E-2
+  23 Dim            1236  1273 | name=enteroenexponente name_span=1240-1257 type_ref=24 value=25
+  24 TypeRef        1261  1268 | name=INTEGER element=-
+  25 IntLit         1271  1272 | value=1
+  26 Dim            1273  1326 | name=cadena name_span=1277-1283 type_ref=27 value=28
+  27 TypeRef        1287  1293 | name=STRING element=-
+  28 StringLit      1297  1325 | value=con \n salto y \t tabulador
+  29 Dim            1326  1381 | name=escapes name_span=1330-1337 type_ref=30 value=31
+  30 TypeRef        1341  1347 | name=STRING element=-
+  31 StringLit      1351  1380 | value=barra \\ y comilla " dentro
+  32 Dim            1381  1429 | name=llaves name_span=1385-1391 type_ref=33 value=34
+  33 TypeRef        1395  1401 | name=STRING element=-
+  34 StringLit      1405  1428 | value=llaves {y} literales
+  35 Dim            1429  1484 | name=interpolada name_span=1433-1444 type_ref=36 value=37
+  36 TypeRef        1448  1454 | name=STRING element=-
+  37 Binary         1458  1483 | op=& left=38 right=42
+  38 Binary         1458  1468 | op=& left=39 right=40
+  39 StringLit      1458  1460 | value=y 
+  40 Interpolate    1460  1468 | value=41
+  41 Name           1461  1467 | value=entero
+  42 StringLit      1468  1483 | value= sale en medio
+  43 Primitive      1484  1520 | name=PRINT args=44,45,46,47 inline=1
+  44 Name           1490  1496 | value=entero
+  45 Name           1498  1505 | value=binario
+  46 Name           1507  1512 | value=octal
+  47 Name           1514  1519 | value=mixto
+  48 Primitive      1520  1561 | name=PRINT args=49,50,51 inline=1
+  49 Name           1526  1535 | value=exponente
+  50 Name           1537  1541 | value=otro
+  51 Name           1543  1560 | value=enteroenexponente
+  52 Primitive      1561  1632 | name=PRINT args=53,54,55,56,57,58,59,60,61 inline=1
+  53 StringLit      1568  1570 | value=[
+  54 Name           1572  1578 | value=cadena
+  55 StringLit      1581  1584 | value=][
+  56 Name           1586  1593 | value=escapes
+  57 StringLit      1596  1599 | value=][
+  58 Name           1601  1607 | value=llaves
+  59 StringLit      1610  1613 | value=][
+  60 Name           1615  1626 | value=interpolada
+  61 StringLit      1629  1631 | value=]
+  62 Dim            1632  1660 | name=remolque name_span=1636-1644 type_ref=63 value=64
+  63 TypeRef        1648  1655 | name=INTEGER element=-
+  64 IntLit         1658  1659 | value=4
+  65 Primitive      1717  1731 | name=PRINT args=66 inline=0
+  66 Name           1723  1731 | value=remolque
+
+; 67 nodo(s)

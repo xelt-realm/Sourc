@@ -1,0 +1,3 @@
+' El acceso a campo parsea y el typechecker lo rechaza (E0025).
+DIM p AS INTEGER = 0
+PRINT p.campo

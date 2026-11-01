@@ -1,0 +1,104 @@
+  81    82 newline       \n | \n
+  83    84 newline       \n | \n
+ 158   159 newline       \n | \n
+ 239   240 newline       \n | \n
+ 301   302 newline       \n | \n
+ 303   304 newline       \n | \n
+ 385   386 newline       \n | \n
+ 461   462 newline       \n | \n
+ 539   540 newline       \n | \n
+ 547   548 newline       \n | \n
+ 549   550 newline       \n | \n
+ 628   629 newline       \n | \n
+ 703   704 newline       \n | \n
+ 783   784 newline       \n | \n
+ 853   854 newline       \n | \n
+ 855   856 newline       \n | \n
+ 936   937 newline       \n | \n
+ 937   940 keyword       DIM | DIM
+ 941   944 ident         neg | neg
+ 945   947 keyword       AS | AS
+ 948   955 keyword       INTEGER | INTEGER
+ 956   957 op            = | =
+ 958   959 op            - | -
+ 959   960 int           9 | 9
+ 960   961 newline       \n | \n
+ 961   964 keyword       DIM | DIM
+ 965   968 ident         dos | dos
+ 969   971 keyword       AS | AS
+ 972   979 keyword       INTEGER | INTEGER
+ 980   981 op            = | =
+ 982   983 int           2 | 2
+ 983   984 newline       \n | \n
+ 984   985 newline       \n | \n
+1002  1003 newline       \n | \n
+1003  1008 keyword       PRINT | PRINT
+1009  1012 ident         neg | neg
+1013  1014 op            \\ | \\
+1015  1018 ident         dos | dos
+1018  1019 newline       \n | \n
+1019  1024 keyword       PRINT | PRINT
+1025  1028 ident         neg | neg
+1029  1030 op            \\ | \\
+1031  1034 ident         neg | neg
+1034  1035 newline       \n | \n
+1035  1040 keyword       PRINT | PRINT
+1041  1042 op            ( | (
+1042  1043 int           0 | 0
+1044  1045 op            - | -
+1046  1049 ident         neg | neg
+1049  1050 op            ) | )
+1051  1052 op            \\ | \\
+1053  1056 ident         dos | dos
+1056  1057 newline       \n | \n
+1057  1058 newline       \n | \n
+1085  1086 newline       \n | \n
+1086  1091 keyword       PRINT | PRINT
+1092  1095 ident         neg | neg
+1096  1099 keyword       DIV | DIV
+1100  1103 ident         dos | dos
+1103  1104 newline       \n | \n
+1104  1109 keyword       PRINT | PRINT
+1110  1113 ident         neg | neg
+1114  1117 keyword       DIV | DIV
+1118  1121 ident         neg | neg
+1121  1122 newline       \n | \n
+1122  1123 newline       \n | \n
+1168  1169 newline       \n | \n
+1169  1174 keyword       PRINT | PRINT
+1175  1178 ident         neg | neg
+1179  1182 keyword       MOD | MOD
+1183  1186 ident         dos | dos
+1186  1187 newline       \n | \n
+1187  1192 keyword       PRINT | PRINT
+1193  1194 op            ( | (
+1194  1195 int           0 | 0
+1196  1197 op            - | -
+1198  1201 ident         neg | neg
+1201  1202 op            ) | )
+1203  1206 keyword       MOD | MOD
+1207  1210 ident         dos | dos
+1210  1211 newline       \n | \n
+1211  1212 newline       \n | \n
+1269  1270 newline       \n | \n
+1270  1275 keyword       PRINT | PRINT
+1276  1277 op            - | -
+1277  1280 float         9.5 | 9.5
+1281  1282 op            \\ | \\
+1283  1284 int           2 | 2
+1284  1285 newline       \n | \n
+1285  1290 keyword       PRINT | PRINT
+1291  1292 op            - | -
+1292  1295 float         9.5 | 9.5
+1296  1299 keyword       DIV | DIV
+1300  1301 int           2 | 2
+1301  1302 newline       \n | \n
+1302  1307 keyword       PRINT | PRINT
+1308  1309 op            - | -
+1309  1312 float         9.5 | 9.5
+1313  1316 keyword       MOD | MOD
+1317  1318 int           2 | 2
+1318  1319 newline       \n | \n
+1319  1319 eof            | 
+
+; 102 token(s)

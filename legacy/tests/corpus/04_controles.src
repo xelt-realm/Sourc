@@ -1,0 +1,26 @@
+' IF en sus dos formas, ELSE IF encadenado, FOR y WHILE.
+DIM x AS INTEGER = 2
+IF x = 1 THEN PRINT "uno"
+IF x = 2 THEN
+    PRINT "dos"
+ELSE IF x = 3 THEN
+    PRINT "tres"
+ELSE
+    PRINT "otro"
+END IF
+
+DIM total AS INTEGER = 0
+FOR i = 1 TO 5
+    total = total + i
+NEXT i
+PRINT total
+
+FOR i = 3 TO 1 STEP -1
+    PRINT i
+NEXT i
+
+DIM j AS INTEGER = 0
+WHILE j < 3
+    PRINT "vuelta " & STR(j)
+    j = j + 1
+WEND

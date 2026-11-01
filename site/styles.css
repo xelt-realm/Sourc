@@ -1,0 +1,110 @@
+/* Sourc — hoja de estilo del sitio.
+ *
+ * Sale de un fichero aparte por una razón concreta: Source **no puede emitir
+ * una llave**, porque `{` abre interpolación dentro de un literal
+ * (`compiler/sourc/lexer.py`, la función que escanea el cuerpo del texto). No
+ * hay `chr` --la única nativa que toca caracteres es `CHARCODE` y va al revés--,
+ * así que ningún programa Source puede producir una. El CSS no puede salir del
+ * programa, y no es una carencia del lenguaje sino una consecuencia de que la
+ * interpolación sea sintaxis.
+ *
+ * Por eso el documento lo genera `site/pagina.src` y los estilos viven aquí.
+ * Y `budgets.toml` ya proyectaba un `styles.css` para la Fase 5: esta decisión
+ * estaba esperando a que alguien la tomara.
+ *
+ * Y por lo mismo hay dos puertas sobre este fichero, en
+ * `tests/test_sitio.py`: que no haya un `border-radius` que no sea `0`, y que
+ * el modo oscuro no se invierta. Un requisito visual sin puerta no es un
+ * requisito, es una intención.
+ */
+
+/* Modo oscuro por defecto. `color-scheme` hace que el navegador pinte también
+ * los controles nativos --barras de scroll, select-- en oscuro, y sin esto
+ * un `<pre>` oscuro con un scrollbar blanco se nota. */
+:root {
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 2.5rem 1.5rem 5rem;
+  background: #0e0e13;
+  color: #e6e6ef;
+  font: 15px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  -webkit-text-size-adjust: 100%;
+}
+
+.envoltorio { max-width: 52rem; margin: 0 auto; }
+
+/* ---------------------------------------------------------------- cabecera */
+
+.cabecera { border-bottom: 1px solid #26262f; padding-bottom: 1.25rem;
+           margin-bottom: 2rem; }
+
+.titulo { margin: 0; font-size: 1.5rem; letter-spacing: .14em;
+          text-transform: uppercase; color: #fff; }
+
+.subtitulo { margin: .4rem 0 0; color: #8a8aa0; font-size: .9rem; }
+
+.marca { color: #6f6f86; }
+
+/* ------------------------------------------------------------------ cajas */
+/* Sin `border-radius` en ninguna regla. Es el requisito, y la puerta está en
+ * `test_el_css_no_tiene_bordes_redondeados`. */
+
+.seccion { border: 1px solid #26262f; padding: 1.25rem 1.35rem; margin: 0 0 1.5rem; }
+.seccion > h2 { margin: 0 0 .9rem; font-size: 1rem; letter-spacing: .12em;
+                text-transform: uppercase; color: #a8a8c0; }
+
+.caja { border: 1px solid #26262f; padding: .9rem 1rem; margin: 0 0 1rem;
+        background: #12121a; }
+
+/* ------------------------------------------------------------------ tablas */
+
+table { border-collapse: collapse; width: 100%; margin: 0 0 1rem; }
+
+th, td { border: 1px solid #26262f; padding: .45rem .6rem; text-align: left;
+         vertical-align: top; font-size: .88rem; }
+
+th { color: #a8a8c0; font-weight: 600; text-transform: uppercase;
+     letter-spacing: .06em; font-size: .74rem; }
+
+tbody tr:nth-child(even) td { background: #12121a; }
+
+/* ------------------------------------------------------------------ texto */
+
+code, pre { font-family: inherit; }
+
+code { background: #1a1a24; border: 1px solid #26262f; padding: .05em .3em;
+       font-size: .88em; color: #d8d8e8; }
+
+pre { background: #101018; border: 1px solid #26262f; padding: .85rem 1rem;
+      overflow-x: auto; font-size: .85rem; line-height: 1.5; color: #d8d8e8; }
+pre code { background: none; border: 0; padding: 0; }
+
+a { color: #7fd1c8; text-decoration: underline; text-underline-offset: .18em; }
+a:hover { color: #a8e6de; }
+
+ul, ol { padding-left: 1.3rem; margin: 0 0 1rem; }
+li { margin: .2rem 0; }
+
+.nota { color: #8a8aa0; font-size: .85rem; }
+.aviso { border-left: 3px solid #7a5fd1; padding-left: .8rem; color: #a9a0d6; }
+.cifra { color: #d1c17f; }
+
+/* ------------------------------------------------------------------- pie */
+
+.pie { border-top: 1px solid #26262f; margin-top: 2.5rem; padding-top: 1rem;
+       color: #6f6f86; font-size: .8rem; }
+
+/* Una sola media query, y no invierte el modo: `color-scheme: dark` está en
+ * `:root` y aquí no se toca. Invertirlo sería el error clásico de poner
+ * `prefers-color-scheme: light` como alternativa y acabar con dos temas a
+ * medias. Este sitio tiene un tema. */
+@media (max-width: 40rem) {
+  body { padding: 1.5rem 1rem 3rem; }
+  .seccion { padding: 1rem; }
+  th, td { font-size: .82rem; }
+}

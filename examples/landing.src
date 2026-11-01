@@ -1,0 +1,36 @@
+screen(1440, 1120)
+draw_gradient_rect(0, 0, 1440, 1120, 1118481, 2105376)
+
+ui_panel(72, 56, 1296, 250, 2236962, 28)
+ui_panel(72, 344, 620, 250, 2697513, 22)
+ui_panel(724, 344, 644, 250, 2697513, 22)
+ui_panel(72, 626, 1296, 342, 2697513, 22)
+ui_panel(72, 1000, 1296, 84, 2236962, 18)
+
+ui_text(".src", 122, 82, 88, 16777215, "Times New Roman")
+ui_text("A small compiled language for fast, expressive games and web apps.", 128, 196, 25, 15395562, "sans-serif")
+ui_text("Write once. Compile to WebAssembly or native code.", 128, 238, 18, 11776947, "sans-serif")
+
+ui_text("What is Source?", 112, 384, 30, 16777215, "sans-serif")
+ui_text("Source is a modern, approachable language with a compact C11 compiler.", 112, 444, 18, 14737632, "sans-serif")
+ui_text("Its Canvas runtime and WebAssembly output ship without frameworks.", 112, 482, 18, 14737632, "sans-serif")
+ui_text("How it works", 764, 384, 30, 16777215, "sans-serif")
+ui_text("One source file, two direct compilation paths:", 764, 444, 18, 14737632, "sans-serif")
+ui_text("Source  ->  C  ->  WebAssembly", 764, 488, 20, 16777215, "monospace")
+ui_text("Source  ->  QBE IL  ->  native", 764, 530, 20, 16777215, "monospace")
+
+ui_text("A taste of the syntax", 112, 666, 30, 16777215, "sans-serif")
+ui_code("var x: int = 10\nwhile true do\n    draw_rect_filled(x, 20, 80, 24, 16777215)\n    flip()\nend", 112, 724, 760, 196)
+
+while true do
+    if ui_button("Copy code", 904, 724, 360, 64, "copy-code") then
+        copy_to_clipboard("var x: int = 10\nwhile true do\n    draw_rect_filled(x, 20, 80, 24, 16777215)\n    flip()\nend")
+    end
+    if ui_button("Download Sourc v0.1.0", 904, 812, 360, 72, "download-source") then
+        print("Opening the Sourc release page")
+    end
+    flip()
+end
+
+ui_text("Fast builds. Small output. No framework required.", 112, 1026, 22, 16777215, "sans-serif")
+ui_text("v0.1.0-alpha", 1172, 1030, 18, 14737632, "monospace")

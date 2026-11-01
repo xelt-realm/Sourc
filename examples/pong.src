@@ -1,0 +1,94 @@
+type Paleta
+    x: float
+    y: float
+    ancho: float
+    alto: float
+end
+
+type Pelota
+    x: float
+    y: float
+    dx: float
+    dy: float
+end
+
+type FrameInfo
+    elapsed: float
+end
+
+var paleta: Paleta
+var pelota: Pelota
+var puntuacion: int = 0
+
+screen(640, 480)
+
+paleta.x = 320.0
+paleta.y = 440.0
+paleta.ancho = 100.0
+paleta.alto = 12.0
+pelota.x = 320.0
+pelota.y = 240.0
+pelota.dx = 140.0
+pelota.dy = 180.0
+
+while true do
+    cls()
+    paleta.x = mouse_x()
+    if paleta.x < paleta.ancho / 2.0 then
+        paleta.x = paleta.ancho / 2.0
+    end
+    if paleta.x > 640.0 - paleta.ancho / 2.0 then
+        paleta.x = 640.0 - paleta.ancho / 2.0
+    end
+
+    pelota.x = pelota.x + pelota.dx * delta()
+    pelota.y = pelota.y + pelota.dy * delta()
+
+    if pelota.x < 10.0 then
+        pelota.x = 10.0
+        pelota.dx = abs(pelota.dx)
+        play_sound("bounce.wav")
+    end
+    if pelota.x > 630.0 then
+        pelota.x = 630.0
+        pelota.dx = -abs(pelota.dx)
+        play_sound("bounce.wav")
+    end
+    if pelota.y < 10.0 then
+        pelota.y = 10.0
+        pelota.dy = abs(pelota.dy)
+        play_sound("bounce.wav")
+    end
+
+    if pelota.y > paleta.y - 10.0 then
+        if pelota.y < paleta.y + paleta.alto then
+            if pelota.x > paleta.x - paleta.ancho / 2.0 then
+                if pelota.x < paleta.x + paleta.ancho / 2.0 then
+                    pelota.y = paleta.y - 10.0
+                    pelota.dy = -abs(pelota.dy)
+                    pelota.dx = (pelota.x - paleta.x) * 2.0
+                    puntuacion = puntuacion + 1
+                    play_sound("bounce.wav")
+                end
+            end
+        end
+    end
+
+    if pelota.y > 490.0 then
+        pelota.x = 320.0
+        pelota.y = 240.0
+        pelota.dx = random(-120.0, 120.0)
+        pelota.dy = 180.0
+    end
+
+    rect(paleta.x - paleta.ancho / 2.0, paleta.y, paleta.ancho, paleta.alto, 16777215)
+    circle(pelota.x, pelota.y, 10.0, 16711680)
+    draw_text("SOURC PONG", 16.0, 28.0, 22, 16777215)
+    draw_text(puntuacion, 16.0, 52.0, 14, 16777215)
+    arena
+        var frame: FrameInfo
+        frame.elapsed = time()
+        draw_text(floor(frame.elapsed), 16.0, 76.0, 14, 16777215)
+    end
+    flip()
+end

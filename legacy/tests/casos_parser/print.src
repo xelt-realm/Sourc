@@ -1,0 +1,5 @@
+' PRINT con coma, con punto y coma y con un solo argumento.
+PRINT "uno", "dos"
+PRINT "a"; "b"
+PRINT "c"
+PRINT 1; 2; TRUE

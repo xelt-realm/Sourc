@@ -1,0 +1,13 @@
+' STRUCT todavía no parsea: el parser pide un nombre donde va el tipo. Cuando la
+' Fase 4 lo implemente, este fichero **empezará a parsear** y el test que lo
+' vigila fallará diciendo que hay que moverlo a `mal/`. Ese es el mecanismo: el
+' gate avisa el día exacto en que tiene que apretar, en vez de autorizarse
+' solo el día que llega la feature.
+
+STRUCT punto
+  x AS INTEGER
+  y AS INTEGER
+END STRUCT
+
+DIM p AS punto = NEW punto
+PRINT p.x

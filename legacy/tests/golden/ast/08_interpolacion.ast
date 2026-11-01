@@ -1,0 +1,35 @@
+   0 Program          43   220 | body=1,4,7,12,21,31
+   1 Dim              44    75 | name=nombre name_span=48-54 type_ref=2 value=3
+   2 TypeRef          58    64 | name=STRING element=-
+   3 StringLit        68    74 | value=mundo
+   4 Dim              75   100 | name=veces name_span=79-84 type_ref=5 value=6
+   5 TypeRef          88    95 | name=INTEGER element=-
+   6 IntLit           98    99 | value=3
+   7 Primitive       100   122 | name=PRINT args=8 inline=0
+   8 Binary          107   120 | op=& left=9 right=10
+   9 StringLit       107   112 | value=hola 
+  10 Interpolate     112   120 | value=11
+  11 Name            113   119 | value=nombre
+  12 Primitive       122   153 | name=PRINT args=13 inline=0
+  13 Binary          129   151 | op=& left=14 right=15
+  14 StringLit       129   140 | value=calculado: 
+  15 Interpolate     140   151 | value=16
+  16 Binary          141   150 | op=+ left=17 right=18
+  17 IntLit          141   142 | value=1
+  18 Binary          145   150 | op=* left=19 right=20
+  19 IntLit          145   146 | value=2
+  20 IntLit          149   150 | value=3
+  21 Primitive       153   189 | name=PRINT args=22 inline=0
+  22 Binary          160   187 | op=& left=23 right=29
+  23 Binary          160   180 | op=& left=24 right=28
+  24 Binary          160   177 | op=& left=25 right=26
+  25 StringLit       160   169 | value=anidado: 
+  26 Interpolate     169   177 | value=27
+  27 Name            170   176 | value=nombre
+  28 StringLit       177   180 | value= x 
+  29 Interpolate     180   187 | value=30
+  30 Name            181   186 | value=veces
+  31 Primitive       189   220 | name=PRINT args=32 inline=0
+  32 StringLit       196   219 | value=literal: {corchetes}
+
+; 33 nodo(s)

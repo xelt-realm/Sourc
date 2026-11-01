@@ -1,0 +1,10 @@
+   0 Program          45   361 | body=1,6
+   1 FunctionDecl    258   322 | name=doble params=x:2 return_type=3 body=4
+   2 TypeRef         278   285 | name=INTEGER element=-
+   3 TypeRef         290   297 | name=INTEGER element=-
+   4 Return          300   309 | value=5
+   5 Name            307   308 | value=x
+   6 FunctionDecl    322   361 | name=aviso params= return_type=- body=7
+   7 Return          341   348 | value=-
+
+; 8 nodo(s)

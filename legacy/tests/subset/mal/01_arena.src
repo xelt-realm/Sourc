@@ -1,0 +1,9 @@
+' ARENA parsea, y por eso es el caso Interesting: no depende de que el parser
+' lo rechace. El gate tiene que verlo y rechazarlo por estar por encima del
+' nivel, no por no estar implementado.
+
+DIM total AS INTEGER = 0
+ARENA temporal
+  total = total + 1
+END ARENA
+PRINT total

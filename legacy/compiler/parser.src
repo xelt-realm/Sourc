@@ -1,0 +1,1498 @@
+' Parser de Sourc escrito en Sourc. Rebanada 2 del bootstrap, parte 2a.
+'
+' ## Qué hay, y qué no
+'
+' El esqueleto del árbol, la pila de cuerpos, las sentencias --`DIM`, asignación,
+' `PRINT`, `RETURN`, `WHILE`, `FOR`, `IF`/`ELSE IF`/`ELSE` y `FUNCTION`-- y las
+' expresiones hoja: un literal o un nombre. **23 de los 31 nodos del AST**, en los
+' seis casos de `tests/casos_parser/`, byte a byte como el parser de Python.
+'
+' Fuera, declarado y con motivo, en vez de implementado a medias:
+'
+' - `Index`, `Call`, `Interpolate`, `ArrayLit`, `Field`, `Unary` y `Binary`.
+' - **La precedencia**, que son nueve niveles (`docs/grammar/sourc.ebnf`,
+'   `or_expr` hasta `power_expr`), y es 2b. Los casos evitan a propósito los
+'   operadores binarios: un caso que los use juzga el árbol y la precedencia a la
+'   vez, y cuando fallara no se sabría cuál de las dos cosas se rompió.
+' - **Los diagnósticos.** No hay ni uno todavía. Cuando los haya --2d--, cada
+'   sitio escribirá una bandera, porque una FUNCTION no puede.
+'
+' ## La regla que decidió cómo se escribe
+'
+' **Toda cadena de condiciones es `ELSE IF`. Nunca `ELSE` seguido de `IF`.**
+'
+' No es estilo. En Source, `ELSE` + `IF` son **dos** bloques y `ELSE IF` es
+' **uno**. Una cadena de cuatro condiciones pasa de un `END IF` a cuatro, y
+' cuatro es el número de sitios donde se puede equivocar uno.
+'
+' La primera versión de este fichero usaba `ELSE` + `IF`, se llenó de `END IF`
+' imposibles de contar y **se revirtió**. El síntoma era siempre el mismo: el
+' compilador informaba de un cierre de más, y el que sobraba no era nunca el que
+' se sospechaba. Con `ELSE IF` la cadena es un bloque, el número de cierres se
+' cuenta mirando, y los seis casos salen byte a byte.
+'
+' Para que no dependa del pulso: `tools/contar_bloques.py` tokeniza el fichero
+' como lo hace el lexer --literales, comentarios y escapes-- y devuelve la
+' profundidad y el primer cierre de más. Con `ELSE IF` no hace falta, y aun así
+' está.
+'
+' ## La pila de cuerpos
+'
+' El cuerpo de un `IF`, un `WHILE`, un `FOR` y una `FUNCTION` es una lista, y
+' las listas de hijos **no** son tramos contiguos: usan `nSiguiente`. Por eso
+' hay una pila de niveles, y cada nivel tiene:
+'
+' - `pLista[nivel]`: la lista en forma de texto, para no tener un array de
+'   punteros a nodos --no hay `ARRAY OF Nodo`, porque un array tiene un tipo y el
+'   AST no tiene uno-- y porque el orden de los hijos se comprueba en el golden.
+' - `pNodo[nivel]`: el nodo al que pertenece este cuerpo.
+' - `pUno[nivel]`: el cuerpo es de una sola sentencia, y eso es cuando **no**
+'   había salto detrás del `THEN`. Invertirlo dejaba abiertos los cuerpos de una
+'   línea y cerraba de más los de bloque. Se comprueba **al final del bucle**, no
+'   en la rama que abrió el nivel: el cuerpo de un `IF x THEN PRINT "a"` lo cierra
+'   el `PRINT`, que va por otra rama del despacho. Y sólo si ya tiene alguna
+'   sentencia; sin `pCola[nivel] <> 0` el cuerpo se cerraba en la misma vuelta en
+'   que se abría, y el `then_body` salía vacío.
+' - `pEncadenado[nivel]`: este nivel es un `ELSE IF`, así que hay más niveles de
+'   la misma cadena por debajo y hay que cerrarlos también.
+' - `pDueno[nivel]`: el `If` al que pertenece este nivel. En una cadena de
+'   `ELSE IF` todos los niveles apuntan al primero, que es el único con `nFin` al
+'   cerrarse el `END`. Sin esto el `nFin` del `IF` de fuera se quedaba a cero y se
+'   lo ponía al último de la cadena.
+'
+' Y hay un detalle que sólo aparece cuando las cadenas tienen `ELSE`: cada `If`
+' de la cadena toma su `nFin` de **su propio** último cuerpo, y el del dueño se
+' pone al final, ya con el `END` dentro. Tomar el `nFin` del dueño antes de
+' consumir el terminador es lo que deja los seis casos en verde.
+'
+' ## Por qué aquí no hay ni una FUNCTION
+'
+' E0067 prohíbe tocar un global, y **leer** un global también cuenta. Probado:
+'
+'     Dim a As Integer = 5
+'     FUNCTION Mira() As Integer
+'       RETURN a          ' E0067
+'     END FUNCTION
+'
+' Así que tampoco hay `tipoActual()` a quien llamar, y cada comparación de token
+' es `tkTipo[pTok] = "keyword" AND tkValor[pTok] = "END"` escrita entera. Eso
+' hace que leer una condición sea largo, y por eso al principio de cada vuelta
+' se copian el tipo y el valor a `tipoT` y `valT`: `tipoT = "keyword" AND
+' valT = "END"` es legible y no se puede equivocar.
+'
+' La consecuencia que se nota al escribir es que **el bloque de una expresión
+' hoja está copiado en cada sitio donde hace falta**, y son cuatro: el
+' valor de un `DIM`, el tamaño de un `NEW`, el lado derecho de una asignación y
+' cada argumento de una primitiva. Se acepta porque el golden cazaría una copia
+' desviada igual que a una función equivocada: es la diferencia entre un judge en
+' el sitio y un test de estructura.
+'
+' ## El árbol
+'
+' Arena con arrays **con nombre**, uno por campo del AST, y no ranuras
+' posicionales. La razón está en `subset.toml`: una ranura `nC[3]` escrita mal
+' lee el campo de otro nodo sin dar ningún error, porque un `INTEGER` es un
+' `INTEGER` sea del nodo que sea. Con un array por campo no hay ranura que
+' teclear: se escribe `cValue[n]` y sólo puede ser eso. El precio es memoria, y
+' es lo que `ARENA` viene a arreglar en la Fase 4.
+'
+' **Una lista de hijos es un tramo contiguo de índices**, no una cadena de
+' hermanos. Se sostiene porque el parser crea los hijos de un nodo uno detrás de
+' otro y sin nada en medio: en `DIM`, el nodo es *k*, el `TypeRef` *k+1* y el
+' valor *k+2*. Lo comprueba `tests/golden/parser/dim.ast`: el `Dim` es el 16, su
+' tipo es el 17 y el 18, y el `NewArray` es el 19 con su `IntLit` el 20.
+'
+' Eso quita el único enlace que quedaba, `nSiguiente`, y con él todo el código
+' de enlace. A cambio, el bucle tiene que dejar los hijos **pegados**: no se
+' puede cerrar un cuerpo, abrir otro, y volver a insertar en el primero.
+'
+' ## La pila, que es lo que falta
+'
+' Para los cuerpos hace falta un bucle y una pila de cuerpos abiertos, en vez de
+' recursión: un `parse_cuerpo` recursivo no puede existir, e inlinearlo en cada
+' cuerpo anidado multiplica por cinco el sitio donde se equivoca uno. La pila
+' guarda, por nivel, el nodo al que pertenece el cuerpo y qué campo suyo se está
+' llenando. Es la parte de 2a que queda, y no se ha escrito todavía.
+
+' ==========================================================================
+' Estado del árbol. El tipo de nodo es un texto y no un número: un número obliga
+' a una tabla de nombres, y esa tabla es un sitio más donde confundir dos cosas.
+
+DIM nnodo AS INTEGER = 0
+DIM nTipo AS ARRAY OF STRING = NEW STRING[4096]
+DIM nIni AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM nFin AS ARRAY OF INTEGER = NEW INTEGER[4096]
+
+' Un array por campo. El nombre *es* el índice.
+DIM cNombre AS ARRAY OF STRING = NEW STRING[4096]
+DIM cTexto AS ARRAY OF STRING = NEW STRING[4096]
+DIM cLiteral AS ARRAY OF STRING = NEW STRING[4096]
+DIM cLogico AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cSpanIni AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cSpanFin AS ARRAY OF INTEGER = NEW INTEGER[4096]
+
+DIM cValue AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cTarget AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cIndex AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cTypeRef AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cElement AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cCount AS ARRAY OF INTEGER = NEW INTEGER[4096]
+
+DIM cArgsLista AS ARRAY OF STRING = NEW STRING[4096]
+DIM cBodyLista AS ARRAY OF STRING = NEW STRING[4096]
+DIM cThenLista AS ARRAY OF STRING = NEW STRING[4096]
+DIM cElseLista AS ARRAY OF STRING = NEW STRING[4096]
+DIM cParamsLista AS ARRAY OF STRING = NEW STRING[4096]
+
+' Los campos que apuntan a un hijo, uno por nombre de campo. Sin ranuras
+' posicionales: una ranura escrita mal lee el campo de otro nodo sin error, que
+' es justo lo que `subset.toml` llama la prohibición más cara.
+DIM cCondition AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cStart AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cStop AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cStep AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cReturnType AS ARRAY OF INTEGER = NEW INTEGER[4096]
+DIM cVar AS ARRAY OF STRING = NEW STRING[4096]
+
+' Los parámetros de una `FUNCTION` van en dos arrays alineados por posición.
+' Un `ArrayLit` de índices no valdría: los índices no son contiguos, porque un
+' parámetro con tipo crea un nodo y uno sin tipo no.
+DIM pNombres AS ARRAY OF STRING = NEW STRING[256]
+DIM pTipos AS ARRAY OF INTEGER = NEW INTEGER[256]
+DIM nParam AS INTEGER = 0
+
+' El hermano siguiente. Una lista de hijos es una cadena por este campo, y no
+' un tramo contiguo de índices: el golden lo dice con `body=1,4,7`, donde entre
+' el 1 y el 4 están el `TypeRef` y el `IntLit` de la primera sentencia. La
+' contigüidad era una hipótesis mía y es falsa en cuanto un nodo tiene hijos.
+' Un tramo se habría roto con el primer `DIM`, y no se habría dado cuenta
+' hasta la tercera sentencia.
+'
+' Es el único enlace del árbol, y es la razón por la que el orden de las
+' sentencias tiene que ser explícito y no "el orden en que se crearon".
+DIM nSiguiente AS ARRAY OF INTEGER = NEW INTEGER[4096]
+
+' --------------------------------------------------------------------------
+' Cuadro. `prevFin` es el fin del último token consumido: el span de una
+' sentencia va del inicio de su primer token al fin del último, y sin acordarse
+' del anterior no hay forma de saberlo.
+
+DIM pTok AS INTEGER = 0
+DIM nSig AS INTEGER = 0
+DIM j AS INTEGER = 0
+DIM n AS INTEGER = 0
+DIM uno AS INTEGER = 0
+DIM dimN AS INTEGER = 0
+DIM objetivo AS INTEGER = 0
+DIM nombreObj AS STRING = ""
+DIM tipoN AS INTEGER = 0
+DIM hoja AS INTEGER = 0
+DIM iniT AS INTEGER = 0
+DIM finT AS INTEGER = 0
+DIM cuerpo AS INTEGER = 0
+DIM largo AS INTEGER = 0
+DIM primero AS INTEGER = 0
+DIM primeroArg AS INTEGER = 0
+DIM argsTexto AS STRING = ""
+DIM ultimoArg AS INTEGER = 0
+DIM nArgs AS INTEGER = 0
+DIM prevFin AS INTEGER = 0
+DIM tipoT AS STRING = ""
+DIM valT AS STRING = ""
+DIM esArray AS BOOLEAN = FALSE
+' La pila de cuerpos abiertos. `pFin` dice qué palabra clave cierra cada nivel:
+' 1 = `END IF`, 2 = `WEND`, 3 = `NEXT`, 4 = `END FUNCTION`, 0 = ninguna (el
+' `Program`). `pCola` es el último nodo añadido, para enlazar el siguiente por
+' `nSiguiente` sin recorrer la lista.
+DIM nivel AS INTEGER = 0
+DIM nivelEnvio AS INTEGER = 0
+DIM pNodo AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM pCampo AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM pFin AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM pCola AS ARRAY OF INTEGER = NEW INTEGER[64]
+' Los dos banderas de la pila son `INTEGER` y no `BOOLEAN`: el contrato de
+' subconjunto no admite `ARRAY OF BOOLEAN`, y no lo admite por una razón --un
+' array de booleanos ocupa una palabra entera por elemento-- que también se
+' cumple aquí. Es lo mismo que hace `cLogico` con `one_liner` y `inline`.
+DIM pUno AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM pEncadenado AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM pLista AS ARRAY OF STRING = NEW STRING[64]
+' El `If` dueño de este nivel. En una cadena de `ELSE IF` todos los niveles
+' apuntan al primero, que es el único que tiene `nFin` al cerrarse el `END`.
+' Sin esto, el `nFin` del `IF` de fuera se quedaba a cero.
+DIM pDueno AS ARRAY OF INTEGER = NEW INTEGER[64]
+DIM dueno AS INTEGER = 0
+DIM cierraNivel AS BOOLEAN = FALSE
+DIM esElseDeIf AS BOOLEAN = FALSE
+DIM encadenadoNuevo AS BOOLEAN = FALSE
+DIM unoNuevo AS BOOLEAN = FALSE
+DIM abre AS BOOLEAN = FALSE
+DIM listaTexto AS STRING = ""
+DIM paramsTexto AS STRING = ""
+DIM nParam AS INTEGER = 0
+DIM cuerpoFin AS INTEGER = 0
+DIM m AS INTEGER = 0
+
+DIM err AS BOOLEAN = FALSE
+DIM errEn AS INTEGER = 0
+
+' El nodo 0 es el `Program` y los índices de nodo usan 0 para "ninguno", así que
+' los nodos reales empiezan en el 1. Si el primero fuera el 0, ese valor
+' significaría dos cosas, y un índice que significa dos cosas no es un índice.
+nTipo[0] = "Program"
+nIni[0] = 0
+nFin[0] = 0
+cBodyLista[0] = ""
+nSiguiente[0] = 0
+nnodo = 1
+pNodo[0] = 0
+pCampo[0] = 1
+pFin[0] = 0
+pCola[0] = 0
+pUno[0] = 0
+pEncadenado[0] = 0
+pLista[0] = ""
+pDueno[0] = 0
+
+' La lista de sentencias del programa, acumulada como texto. Se construye
+' añadiendo, no recorriendo: recorrer al cerrar obligaría a duplicar el
+' recorrido en cada sitio donde se cierra un cuerpo, y el texto sale igual de
+' largo. Es O(n^2) en el número de sentencias del cuerpo, que para 2a son
+' menos de veinte y no es un problema; si lo fuera, el sitio a cambiar es esta
+' línea y no el algoritmo entero.
+
+' El cuerpo del programa es una lista plana, y como los nodos se crean
+' en orden y no hay nada en medio, la lista es exactamente 1..nnodo-1. Eso se
+' escribe al final, cuando ya se sabe.
+WHILE pTok < tkN AND NOT err
+  ' El token de esta vuelta, copiado a dos variables. Se comparan `tipoT` y
+  ' `valT` en vez de `tkTipo[pTok]` y `tkValor[pTok]` porque la comparación
+  ' entera es ilegible y porque `AND` no cortocircuita: cualquier acceso por
+  ' índice al final de una condición es un `AND` que hay que anidar.
+  tipoT = tkTipo[pTok]
+  valT = tkValor[pTok]
+  ' ---------------------------------------------------------------------
+  ' Cierre del cuerpo en curso.
+  '
+  ' Cada nivel mira su propia palabra clave, y `END` necesita mirar el token de
+  ' al lado porque `END IF`, `END WHILE` y `END FUNCTION` comparten la primera.
+  ' Es un bloque con `ELSE IF`: cuatro condiciones son **un** cierre, y no ocho.
+  ' Esa es la regla que salió de la primera versión de 2a-1, que se revirtió.
+  cierraNivel = FALSE
+  IF nivel > 0 THEN
+    IF pFin[nivel] = 1 THEN
+      IF tipoT = "keyword" AND valT = "END" AND pTok + 1 < tkN AND tkTipo[pTok + 1] = "keyword" AND tkValor[pTok + 1] = "IF" THEN
+        cierraNivel = TRUE
+      END IF
+    ELSE IF pFin[nivel] = 2 THEN
+      IF tipoT = "keyword" AND valT = "WEND" THEN
+        cierraNivel = TRUE
+      END IF
+    ELSE IF pFin[nivel] = 3 THEN
+      IF tipoT = "keyword" AND valT = "NEXT" THEN
+        cierraNivel = TRUE
+      END IF
+    ELSE
+      IF tipoT = "keyword" AND valT = "END" AND pTok + 1 < tkN AND tkTipo[pTok + 1] = "keyword" AND tkValor[pTok + 1] = "FUNCTION" THEN
+        cierraNivel = TRUE
+      END IF
+    END IF
+  END IF
+
+  IF cierraNivel THEN
+    ' El `nFin` de este nivel es donde acaba su lista, que es justo donde
+    ' estaba el cursor al cerrarlo. Se anota **antes** de consumir el terminador:
+    ' en una cadena de `ELSE IF` cada `If` toma el suyo del último cuerpo suyo, y
+    ' el del dueño se pone al final, ya con el `END` dentro.
+    nFin[pNodo[nivel]] = prevFin
+    dueno = pDueno[nivel]
+    listaTexto = pLista[nivel]
+    cuerpoFin = pNodo[nivel]
+    IF pFin[nivel] = 1 THEN
+      IF pCampo[nivel] = 2 THEN
+        cElseLista[cuerpoFin] = listaTexto
+      ELSE
+        cThenLista[cuerpoFin] = listaTexto
+      END IF
+    ELSE
+      cBodyLista[cuerpoFin] = listaTexto
+    END IF
+    nivel = nivel - 1
+    ' `END IF`, `END WHILE` y `END FUNCTION` llevan segunda palabra; `WEND` y
+    ' `NEXT` no. `NEXT` puede llevar el nombre de la variable del bucle, y el
+    ' parser de Python lo comprueba contra el del `FOR`: eso es un diagnóstico y
+    ' es 2d, así que aquí sólo se come.
+    prevFin = tkFin[pTok]
+    pTok = pTok + 1
+    IF pTok < tkN AND tkTipo[pTok] = "keyword" THEN
+      IF tkValor[pTok] = "IF" OR tkValor[pTok] = "WHILE" OR tkValor[pTok] = "FUNCTION" THEN
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+      END IF
+    END IF
+    IF pTok < tkN AND tkTipo[pTok] = "ident" THEN
+      prevFin = tkFin[pTok]
+      pTok = pTok + 1
+    END IF
+    ' Una cadena de `ELSE IF` no consume el `END`: se sigue cerrando hacia arriba.
+    ' Y el `nFin` es el del `If` **dueño** del `END`, que es el primero que no
+    ' venía de un `ELSE IF`. Los de la cadena ya tienen su lista escrita y su
+    ' `nFin` puesto cuando se los cerró su propio `ELSE`.
+    WHILE nivel > 0 AND pEncadenado[nivel] <> 0
+      listaTexto = pLista[nivel]
+      cuerpoFin = pNodo[nivel]
+      IF pCampo[nivel] = 2 THEN
+        cElseLista[cuerpoFin] = listaTexto
+      ELSE
+        cThenLista[cuerpoFin] = listaTexto
+      END IF
+      nivel = nivel - 1
+    WEND
+    cuerpoFin = dueno
+    WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+      prevFin = tkFin[pTok]
+      pTok = pTok + 1
+    WEND
+    ' El `nFin` va **después** de ese salto: el span de un cuerpo incluye el salto
+    ' de línea que sigue a su palabra de cierre, porque `span_from` en el parser de
+    ' Python lee `tokens[self.pos - 1]` y `end_statement()` se ha comido el salto.
+    nFin[cuerpoFin] = prevFin
+
+  ELSE
+    ' ---------------------------------------------------------------- ELSE
+    ' Un `ELSE` cierra el `then_body` del nivel y abre el `else_body` sobre el
+    ' mismo nodo. La pila es lo que lo permite sin dos punteros al mismo nodo.
+    esElseDeIf = FALSE
+    IF nivel > 0 AND pFin[nivel] = 1 AND tipoT = "keyword" AND valT = "ELSE" THEN
+      esElseDeIf = TRUE
+    END IF
+
+    IF esElseDeIf THEN
+      ' El dueño de la cadena se hereda del nivel que se está cerrando, y no
+      ' se pone el nodo de este `ELSE`. En una cadena de `ELSE IF` el único con
+      ' `nFin` es el primero, y tomarlo del nivel equivocado se lo ponía al
+      ' último: el golden lo enseña, `14 If ... 0` donde va `329`.
+      dueno = pDueno[nivel]
+      listaTexto = pLista[nivel]
+      cuerpoFin = pNodo[nivel]
+      cThenLista[cuerpoFin] = listaTexto
+      nivel = nivel - 1
+      prevFin = tkFin[pTok]
+      pTok = pTok + 1
+
+      encadenadoNuevo = FALSE
+      IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "IF" THEN
+        encadenadoNuevo = TRUE
+      ELSE
+        ' Un `ELSE` a secas: sólo se abre el `else_body` sobre el mismo nodo, y
+        ' no se crea ningún `If` nuevo.
+        nivel = nivel + 1
+        pNodo[nivel] = cuerpoFin
+        pCampo[nivel] = 2
+        pFin[nivel] = 1
+        pCola[nivel] = 0
+        pLista[nivel] = ""
+        unoNuevo = FALSE
+        IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+          unoNuevo = TRUE
+        END IF
+        ' `pUno` significa "una sola sentencia", y eso es cuando **no** había
+        ' salto detrás del `THEN`. Invertirlo dejaba abiertos los cuerpos de una
+        ' línea y cerraba de más los de bloque.
+        pUno[nivel] = 0
+            IF unoNuevo THEN
+        pUno[nivel] = 0
+            ELSE
+              pUno[nivel] = 1
+            END IF
+        pEncadenado[nivel] = 0
+        pDueno[nivel] = dueno
+        WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        WEND
+      END IF
+
+      IF encadenadoNuevo THEN
+        ' El `If` de la cadena. Su span empieza en el `IF`, no en donde acabó el
+        ' `ELSE`, y se cuelga del `else_body` del de fuera, que tiene exactamente
+        ' esa sentencia y ninguna más.
+        iniT = tkCol[pTok]
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+        n = nnodo
+        nTipo[n] = "If"
+        nIni[n] = iniT
+        nFin[n] = 0
+        nSiguiente[n] = 0
+        cThenLista[n] = ""
+        cElseLista[n] = "-"
+        cLogico[n] = 0
+        cCondition[n] = 0
+        nnodo = n + 1
+        cElseLista[cuerpoFin] = STR(n)
+        hoja = 0
+        tipoT = tkTipo[pTok]
+        valT = tkValor[pTok]
+        IF tipoT = "ident" THEN
+          hoja = nnodo
+          nTipo[hoja] = "Name"
+          nIni[hoja] = tkCol[pTok]
+          nFin[hoja] = tkFin[pTok]
+          cTexto[hoja] = valT
+          nnodo = hoja + 1
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        ELSE IF tipoT = "keyword" AND (valT = "TRUE" OR valT = "FALSE") THEN
+          hoja = nnodo
+          nTipo[hoja] = "BoolLit"
+          nIni[hoja] = tkCol[pTok]
+          nFin[hoja] = tkFin[pTok]
+          IF valT = "TRUE" THEN
+            cLogico[hoja] = 1
+          ELSE
+            cLogico[hoja] = 0
+          END IF
+          nnodo = hoja + 1
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        ELSE
+          err = TRUE
+          errEn = pTok
+        END IF
+        cCondition[n] = hoja
+        IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "THEN" THEN
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        ELSE
+          err = TRUE
+          errEn = pTok
+        END IF
+        ' El nivel que se abre es el `then_body` del `If` nuevo: `pCampo` es 1.
+        nivel = nivel + 1
+        pNodo[nivel] = n
+        pCampo[nivel] = 1
+        pFin[nivel] = 1
+        pCola[nivel] = 0
+        pLista[nivel] = ""
+        unoNuevo = FALSE
+        IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+          unoNuevo = TRUE
+        END IF
+        pUno[nivel] = 0
+        IF unoNuevo THEN
+          pUno[nivel] = 0
+        ELSE
+          pUno[nivel] = 1
+        END IF
+        pEncadenado[nivel] = 1
+        pDueno[nivel] = dueno
+        WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        WEND
+      END IF
+
+    ELSE
+      ' ------------------------------------------------------------ ELSE
+      ' Un salto de línea, o una sentencia. El despacho entero es una cadena de
+      ' `ELSE IF`: cuatro condiciones, un bloque, un cierre.
+      IF tipoT = "newline" THEN
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+
+      ELSE
+
+    ' --------------------------------------------------- PRINT o asignar
+    IF tipoT = "keyword" AND valT = "DIM" THEN
+
+      ' ------------------------------------------------------------- DIM
+      iniT = tkCol[pTok]
+      dimN = nnodo
+      nTipo[dimN] = "Dim"
+      nIni[dimN] = iniT
+      nFin[dimN] = 0
+      cNombre[dimN] = ""
+      cSpanIni[dimN] = 0
+      cSpanFin[dimN] = 0
+      cTypeRef[dimN] = 0
+      cValue[dimN] = 0
+      nnodo = dimN + 1
+      prevFin = tkFin[pTok]
+      pTok = pTok + 1
+
+      ' El nombre, con su span propio: un diagnóstico lo necesita y el span de
+      ' la sentencia no sirve para señalar "aquí".
+      prevFin = tkFin[pTok]
+      cNombre[dimN] = tkValor[pTok]
+      cSpanIni[dimN] = tkCol[pTok]
+      cSpanFin[dimN] = tkFin[pTok]
+      pTok = pTok + 1
+
+      ' ¿Tipo?
+      tipoN = 0
+      IF tkTipo[pTok] = "keyword" AND tkValor[pTok] = "AS" THEN
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+        tipoN = nnodo
+        nTipo[tipoN] = "TypeRef"
+        ' El span empieza en la palabra del tipo, no en donde acabó el `AS`.
+        ' `span_from` en el parser de Python arranca en el primer token de lo
+        ' que compone el nodo, y para un `TypeRef` ese token es el nombre.
+        nIni[tipoN] = tkCol[pTok]
+        nFin[tipoN] = tkFin[pTok]
+        cNombre[tipoN] = tkValor[pTok]
+        cElement[tipoN] = 0
+        esArray = tkValor[pTok] = "ARRAY"
+        nnodo = tipoN + 1
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+        ' ARRAY OF T: el elemento es otro `TypeRef`. La condición es sobre el
+        ' nombre **que ya se ha leido**, no sobre el token siguiente: el
+        ' `ARRAY` de `AS ARRAY OF T` es el nombre del tipo, y mirar el siguiente
+        ' es mirar el `OF` y no encontrarlo, que es como se quedaba sin
+        ' elemento.
+        ' El span del exterior NO cubre al elemento, y no es unArrange
+        ' mistake: `TypeRef(ARRAY)` acaba en la palabra ARRAY y su elemento
+        ' empieza después del OF. El parser de Python hace lo mismo y el golden
+        ' lo fija, así que un invariante de anidamiento de spans sería falso.
+        IF esArray THEN
+          IF tkTipo[pTok] = "keyword" AND tkValor[pTok] = "OF" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            n = nnodo
+            nTipo[n] = "TypeRef"
+            nIni[n] = tkCol[pTok]
+            nFin[n] = tkFin[pTok]
+            cNombre[n] = tkValor[pTok]
+            cElement[n] = 0
+            nnodo = n + 1
+            cElement[tipoN] = n
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          END IF
+        END IF
+        cTypeRef[dimN] = tipoN
+      END IF
+
+      ' ¿Valor?
+      IF tkTipo[pTok] = "op" AND tkValor[pTok] = "=" THEN
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+
+        ' ¿NEW T[n]?
+        IF tkTipo[pTok] = "keyword" AND tkValor[pTok] = "NEW" THEN
+          ' El `NEW` se guarda su posición **antes** de avanzar, porque el nodo se
+          ' crea después y a esas alturas `pTok` ya está en el tipo.
+          iniT = tkCol[pTok]
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+          n = nnodo
+          nTipo[n] = "NewArray"
+          ' El span empieza en el `NEW`, no en el tipo: es lo que dice el
+          ' golden, y lo que hace `span_from` con el primer token del nodo.
+          nIni[n] = iniT
+          nFin[n] = 0
+          ' El nombre del tipo se lee **antes** de avanzar. La versión anterior
+          ' lo leía después y se quedaba con el corchete de apertura, que es un
+          ' `op` y no un `keyword`, así que `type_name=[` salía en el golden sin
+          ' que ningún error dijera nada: un `op` le cabe como texto a un
+          ' `STRING`.
+          cNombre[n] = tkValor[pTok]
+          cCount[n] = 0
+          cSpanIni[n] = tkCol[pTok]
+          cSpanFin[n] = tkFin[pTok]
+          nnodo = n + 1
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+
+          ' El corchete de apertura.
+          IF tkTipo[pTok] = "op" AND tkValor[pTok] = "[" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+
+          ' El tamaño, que es una expresión hoja. Quinto bloque de hoja, y aquí
+          ' sólo caben `int` y `float` porque un tamaño no puede ser un texto.
+          hoja = 0
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          IF tipoT = "int" THEN
+            hoja = nnodo
+            nTipo[hoja] = "IntLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            IF tipoT = "float" THEN
+              hoja = nnodo
+              nTipo[hoja] = "FloatLit"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cLiteral[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              err = TRUE
+              errEn = pTok
+            END IF
+          END IF
+          cCount[n] = hoja
+
+          ' El corchete de cierre. El `NewArray` acaba ahí, no en el tamaño.
+          IF tkTipo[pTok] = "op" AND tkValor[pTok] = "]" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            nFin[n] = prevFin
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cValue[dimN] = n
+        ELSE
+          ' Un valor normal, que es una expresión hoja.
+          hoja = 0
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          IF tipoT = "int" THEN
+            hoja = nnodo
+            nTipo[hoja] = "IntLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "float" THEN
+            hoja = nnodo
+            nTipo[hoja] = "FloatLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "string" THEN
+            hoja = nnodo
+            nTipo[hoja] = "StringLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "ident" THEN
+            hoja = nnodo
+            nTipo[hoja] = "Name"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "keyword" AND (valT = "TRUE" OR valT = "FALSE") THEN
+            hoja = nnodo
+            nTipo[hoja] = "BoolLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            IF valT = "TRUE" THEN
+              cLogico[hoja] = 1
+            ELSE
+              cLogico[hoja] = 0
+            END IF
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cValue[dimN] = hoja
+        END IF
+      END IF
+
+      ' La sentencia se cuelga de la lista del programa. El orden importa y lo
+      ' escribe el golden: las sentencias van en el orden del fuente aunque sus
+      ' hijos se intercalen.
+      nSiguiente[dimN] = 0
+      IF pCola[nivel] = 0 THEN
+        pLista[nivel] = pLista[nivel] & STR(dimN)
+      ELSE
+        pLista[nivel] = pLista[nivel] & "," & STR(dimN)
+        nSiguiente[pCola[nivel]] = dimN
+      END IF
+      pCola[nivel] = dimN
+
+      ' El fin de sentencia: un salto de línea o un `;`.
+      IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+      ELSE
+        IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = ";" THEN
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+          WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          WEND
+        ELSE
+          WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          WEND
+        END IF
+      END IF
+      ' El `nFin` va **después** de comer el final de sentencia, porque el span
+      ' de una sentencia en el parser de Python incluye el salto de línea que la
+      ' cierra: `DIM a = 7` acaba donde acaba ese salto. Ponerlo antes dejaba
+      ' todos los finales de sentencia una posición cortos.
+      nFin[dimN] = prevFin
+
+    ELSE
+      ' --------------------------------------------------- PRINT o asignar
+      IF tipoT = "keyword" AND valT = "PRINT" THEN
+        iniT = tkCol[pTok]
+        n = nnodo
+        nTipo[n] = "Primitive"
+        nIni[n] = iniT
+        nFin[n] = 0
+        cNombre[n] = valT
+        cArgsLista[n] = ""
+        cLogico[n] = 0
+        nnodo = n + 1
+        prevFin = tkFin[pTok]
+        pTok = pTok + 1
+        primeroArg = 0
+        argsTexto = ""
+        nArgs = 0
+
+        ' Los argumentos, separados por `,` o `;`. Un `;` pone `inline`, que es
+        ' lo que le dice al pegamento que no añada un salto de línea.
+        WHILE pTok < tkN AND tkTipo[pTok] <> "newline" AND tkTipo[pTok] <> "eof"
+          hoja = 0
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          IF tipoT = "int" THEN
+            hoja = nnodo
+            nTipo[hoja] = "IntLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "float" THEN
+            hoja = nnodo
+            nTipo[hoja] = "FloatLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "string" THEN
+            hoja = nnodo
+            nTipo[hoja] = "StringLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "ident" THEN
+            hoja = nnodo
+            nTipo[hoja] = "Name"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "keyword" AND (valT = "TRUE" OR valT = "FALSE") THEN
+            hoja = nnodo
+            nTipo[hoja] = "BoolLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            IF valT = "TRUE" THEN
+              cLogico[hoja] = 1
+            ELSE
+              cLogico[hoja] = 0
+            END IF
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          IF primeroArg = 0 THEN
+            primeroArg = hoja
+            argsTexto = STR(hoja)
+          ELSE
+            argsTexto = argsTexto & "," & STR(hoja)
+          END IF
+          nArgs = nArgs + 1
+          ' El separador va después del argumento y antes del siguiente.
+          IF pTok < tkN AND tkTipo[pTok] = "op" THEN
+            IF tkValor[pTok] = "," THEN
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              IF tkValor[pTok] = ";" THEN
+                cLogico[n] = 1
+                prevFin = tkFin[pTok]
+                pTok = pTok + 1
+              ELSE
+                err = TRUE
+                errEn = pTok
+              END IF
+            END IF
+          END IF
+        WEND
+        cArgsLista[n] = argsTexto
+        IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+          prevFin = tkFin[pTok]
+          pTok = pTok + 1
+        END IF
+        ' El `nFin` va después de comer el final de sentencia, por lo mismo que
+        ' en el `DIM`: el span de una sentencia incluye el salto que la cierra.
+        nFin[n] = prevFin
+        ' Y se cuelga de la lista del programa.
+        nSiguiente[n] = 0
+        IF pCola[nivel] = 0 THEN
+          pLista[nivel] = pLista[nivel] & STR(n)
+        ELSE
+          pLista[nivel] = pLista[nivel] & "," & STR(n)
+          nSiguiente[pCola[nivel]] = n
+        END IF
+        pCola[nivel] = n
+
+      ELSE IF tipoT = "ident" THEN
+          ' -------------------------------------------------- asignación
+          ' El identificador se lee **sin** crear el nodo `Name`, porque en
+          ' pre-orden el `Assign` va antes que su objetivo. Crear el `Name` primero
+          ' lo dejaba con un índice menor y el golden lo enseña: `body=1,4,7` se
+          ' convertía en `body=1,4,8`.
+          iniT = tkCol[pTok]
+          finT = tkFin[pTok]
+          nombreObj = valT
+          pTok = pTok + 1
+          IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = "=" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            n = nnodo
+            nTipo[n] = "Assign"
+            nIni[n] = iniT
+            nFin[n] = 0
+            cTarget[n] = 0
+            cValue[n] = 0
+            nnodo = n + 1
+            hoja = nnodo
+            nTipo[hoja] = "Name"
+            nIni[hoja] = iniT
+            nFin[hoja] = finT
+            cTexto[hoja] = nombreObj
+            nnodo = hoja + 1
+            cTarget[n] = hoja
+            hoja = 0
+            tipoT = tkTipo[pTok]
+            valT = tkValor[pTok]
+            IF tipoT = "int" THEN
+              hoja = nnodo
+              nTipo[hoja] = "IntLit"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cLiteral[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              IF tipoT = "ident" THEN
+                hoja = nnodo
+                nTipo[hoja] = "Name"
+                nIni[hoja] = tkCol[pTok]
+                nFin[hoja] = tkFin[pTok]
+                cTexto[hoja] = valT
+                nnodo = hoja + 1
+                prevFin = tkFin[pTok]
+                pTok = pTok + 1
+              ELSE
+                err = TRUE
+                errEn = pTok
+              END IF
+            END IF
+            cValue[n] = hoja
+            IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            END IF
+            nFin[n] = prevFin
+          ELSE
+            ' Una expresión suelta, que no es ninguna sentencia.
+            err = TRUE
+            errEn = pTok
+          END IF
+            nSiguiente[n] = 0
+            IF pCola[nivel] = 0 THEN
+              pLista[nivel] = pLista[nivel] & STR(n)
+            ELSE
+              pLista[nivel] = pLista[nivel] & "," & STR(n)
+              nSiguiente[pCola[nivel]] = n
+            END IF
+            pCola[nivel] = n
+      ELSE IF tipoT = "keyword" AND (valT = "IF" OR valT = "WHILE" OR valT = "FOR" OR valT = "FUNCTION" OR valT = "RETURN") THEN
+
+        ' ------------------------------------------------- sentencia con cuerpo
+        ' El nodo se crea antes que sus hijos, que es lo que exige el pre-orden,
+        ' y su `nFin` se rellena al cerrar el cuerpo, porque el span de un cuerpo
+        ' incluye la palabra que lo cierra.
+        n = nnodo
+        prevFin = tkFin[pTok]
+        iniT = tkCol[pTok]
+        nIni[n] = iniT
+        nFin[n] = 0
+        nSiguiente[n] = 0
+        abre = FALSE
+        nivelEnvio = nivel
+
+        IF valT = "IF" THEN
+          nTipo[n] = "If"
+          cThenLista[n] = ""
+          cElseLista[n] = "-"
+          cLogico[n] = 0
+          cCondition[n] = 0
+          nnodo = n + 1
+          pTok = pTok + 1
+
+          ' La condición: un literal booleano o un nombre. Un bloque, con
+          ' `ELSE IF`; la precedencia es 2b y una condición puede ser cualquier
+          ' expresión que quepa en un `BOOLEAN`.
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          hoja = 0
+          IF tipoT = "ident" THEN
+            hoja = nnodo
+            nTipo[hoja] = "Name"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "keyword" AND (valT = "TRUE" OR valT = "FALSE") THEN
+            hoja = nnodo
+            nTipo[hoja] = "BoolLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            IF valT = "TRUE" THEN
+              cLogico[hoja] = 1
+            ELSE
+              cLogico[hoja] = 0
+            END IF
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cCondition[n] = hoja
+
+          IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "THEN" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+
+          ' ¿Bloque o una línea? ADR 0006: bloque si y sólo si hay un salto de
+          ' línea justo detrás del `THEN`. Es la decisión de la que depende que
+          ' `IF x THEN PRINT "a"` no abra un cuerpo.
+          unoNuevo = FALSE
+          IF pTok < tkN AND tkTipo[pTok] = "newline" THEN
+            unoNuevo = TRUE
+            WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            WEND
+          ELSE
+            cLogico[n] = 1
+          END IF
+
+          nivel = nivel + 1
+          pNodo[nivel] = n
+          pCampo[nivel] = 1
+          pFin[nivel] = 1
+          pCola[nivel] = 0
+          pLista[nivel] = ""
+          pUno[nivel] = 0
+          IF unoNuevo THEN
+        pUno[nivel] = 0
+          ELSE
+            pUno[nivel] = 1
+          END IF
+          pEncadenado[nivel] = 0
+          pDueno[nivel] = n
+          abre = TRUE
+
+        ELSE IF valT = "WHILE" THEN
+          nTipo[n] = "While"
+          cBodyLista[n] = ""
+          cCondition[n] = 0
+          nnodo = n + 1
+          pTok = pTok + 1
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          hoja = 0
+          IF tipoT = "ident" THEN
+            hoja = nnodo
+            nTipo[hoja] = "Name"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cTexto[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "keyword" AND (valT = "TRUE" OR valT = "FALSE") THEN
+            hoja = nnodo
+            nTipo[hoja] = "BoolLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            IF valT = "TRUE" THEN
+              cLogico[hoja] = 1
+            ELSE
+              cLogico[hoja] = 0
+            END IF
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cCondition[n] = hoja
+          nivel = nivel + 1
+          pNodo[nivel] = n
+          pCampo[nivel] = 1
+          pFin[nivel] = 2
+          pCola[nivel] = 0
+          pLista[nivel] = ""
+          pUno[nivel] = 0
+          pEncadenado[nivel] = 0
+          pDueno[nivel] = n
+          abre = TRUE
+
+        ELSE IF valT = "FOR" THEN
+          nTipo[n] = "For"
+          cBodyLista[n] = ""
+          cVar[n] = ""
+          cSpanIni[n] = 0
+          cSpanFin[n] = 0
+          cStart[n] = 0
+          cStop[n] = 0
+          cStep[n] = 0
+          nnodo = n + 1
+          pTok = pTok + 1
+          prevFin = tkFin[pTok]
+          iniT = tkCol[pTok]
+          cVar[n] = tkValor[pTok]
+          cSpanIni[n] = tkCol[pTok]
+          cSpanFin[n] = tkFin[pTok]
+          pTok = pTok + 1
+
+          IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = "=" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+
+          ' El arranque. Cuarto bloque de hoja y aquí sólo caben `int` y
+          ' `float`: un rango de `FOR` es entero o flotante, y `STR` no vale.
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          hoja = 0
+          IF tipoT = "int" THEN
+            hoja = nnodo
+            nTipo[hoja] = "IntLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "float" THEN
+            hoja = nnodo
+            nTipo[hoja] = "FloatLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cStart[n] = hoja
+
+          IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "TO" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+
+          ' El tope.
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          hoja = 0
+          IF tipoT = "int" THEN
+            hoja = nnodo
+            nTipo[hoja] = "IntLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE IF tipoT = "float" THEN
+            hoja = nnodo
+            nTipo[hoja] = "FloatLit"
+            nIni[hoja] = tkCol[pTok]
+            nFin[hoja] = tkFin[pTok]
+            cLiteral[hoja] = valT
+            nnodo = hoja + 1
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            err = TRUE
+            errEn = pTok
+          END IF
+          cStop[n] = hoja
+
+          ' El `STEP`, opcional.
+          IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "STEP" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            tipoT = tkTipo[pTok]
+            valT = tkValor[pTok]
+            hoja = 0
+            IF tipoT = "int" THEN
+              hoja = nnodo
+              nTipo[hoja] = "IntLit"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cLiteral[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE IF tipoT = "float" THEN
+              hoja = nnodo
+              nTipo[hoja] = "FloatLit"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cLiteral[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              err = TRUE
+              errEn = pTok
+            END IF
+            cStep[n] = hoja
+          ELSE
+            cStep[n] = 0
+          END IF
+
+          nivel = nivel + 1
+          pNodo[nivel] = n
+          pCampo[nivel] = 1
+          pFin[nivel] = 3
+          pCola[nivel] = 0
+          pLista[nivel] = ""
+          pUno[nivel] = 0
+          pEncadenado[nivel] = 0
+          pDueno[nivel] = n
+          abre = TRUE
+
+        ELSE IF valT = "FUNCTION" THEN
+          nTipo[n] = "FunctionDecl"
+          cBodyLista[n] = ""
+          cNombre[n] = ""
+          cReturnType[n] = 0
+          paramsTexto = ""
+          nParam = 0
+          nnodo = n + 1
+          pTok = pTok + 1
+          prevFin = tkFin[pTok]
+          cNombre[n] = tkValor[pTok]
+          pTok = pTok + 1
+
+          ' Los paréntesis y los parámetros. Cada parámetro con tipo crea un
+          ' `TypeRef` y uno sin tipo no, así que los índices de tipo no son
+          ' contiguos: por eso van en un array alineado con el de nombres, y no
+          ' en un `ArrayLit`.
+          IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = "(" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            WHILE pTok < tkN AND tkTipo[pTok] = "ident"
+              pNombres[nParam] = tkValor[pTok]
+              pTipos[nParam] = 0
+              nParam = nParam + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+              IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "AS" THEN
+                prevFin = tkFin[pTok]
+                pTok = pTok + 1
+                m = nnodo
+                nTipo[m] = "TypeRef"
+                nIni[m] = tkCol[pTok]
+                nFin[m] = tkFin[pTok]
+                cNombre[m] = tkValor[pTok]
+                cElement[m] = 0
+                nnodo = m + 1
+                pTipos[nParam - 1] = m
+                prevFin = tkFin[pTok]
+                pTok = pTok + 1
+              END IF
+              IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = "," THEN
+                prevFin = tkFin[pTok]
+                pTok = pTok + 1
+              END IF
+            WEND
+            IF pTok < tkN AND tkTipo[pTok] = "op" AND tkValor[pTok] = ")" THEN
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              err = TRUE
+              errEn = pTok
+            END IF
+          END IF
+          ' `params=` es `nombre:indice` por parámetro, con `-` cuando no tiene
+          ' tipo, y cadena vacía cuando no hay parámetros: las tres cosas se
+          ' distinguen en el golden.
+          j = 0
+          WHILE j < nParam
+            IF paramsTexto <> "" THEN
+              paramsTexto = paramsTexto & ","
+            END IF
+            paramsTexto = paramsTexto & Visible(pNombres[j]) & ":"
+            IF pTipos[j] = 0 THEN
+              paramsTexto = paramsTexto & "-"
+            ELSE
+              paramsTexto = paramsTexto & STR(pTipos[j])
+            END IF
+            j = j + 1
+          WEND
+          cParamsLista[n] = paramsTexto
+
+          ' El tipo de retorno, opcional.
+          IF pTok < tkN AND tkTipo[pTok] = "keyword" AND tkValor[pTok] = "AS" THEN
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+            m = nnodo
+            nTipo[m] = "TypeRef"
+            nIni[m] = tkCol[pTok]
+            nFin[m] = tkFin[pTok]
+            cNombre[m] = tkValor[pTok]
+            cElement[m] = 0
+            nnodo = m + 1
+            cReturnType[n] = m
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          ELSE
+            cReturnType[n] = 0
+          END IF
+
+          nivel = nivel + 1
+          pNodo[nivel] = n
+          pCampo[nivel] = 1
+          pFin[nivel] = 4
+          pCola[nivel] = 0
+          pLista[nivel] = ""
+          pUno[nivel] = 0
+          pEncadenado[nivel] = 0
+          pDueno[nivel] = n
+          abre = TRUE
+
+        ELSE
+          ' RETURN, con valor o sin él.
+          nTipo[n] = "Return"
+          cValue[n] = 0
+          nnodo = n + 1
+          pTok = pTok + 1
+          tipoT = tkTipo[pTok]
+          valT = tkValor[pTok]
+          hoja = 0
+          IF tipoT = "newline" OR tipoT = "eof" THEN
+            cValue[n] = 0
+          ELSE
+            IF tipoT = "ident" THEN
+              hoja = nnodo
+              nTipo[hoja] = "Name"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cTexto[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE IF tipoT = "int" THEN
+              hoja = nnodo
+              nTipo[hoja] = "IntLit"
+              nIni[hoja] = tkCol[pTok]
+              nFin[hoja] = tkFin[pTok]
+              cLiteral[hoja] = valT
+              nnodo = hoja + 1
+              prevFin = tkFin[pTok]
+              pTok = pTok + 1
+            ELSE
+              err = TRUE
+              errEn = pTok
+            END IF
+            cValue[n] = hoja
+          END IF
+          nFin[n] = prevFin
+          WHILE pTok < tkN AND tkTipo[pTok] = "newline"
+            prevFin = tkFin[pTok]
+            pTok = pTok + 1
+          WEND
+          nFin[n] = prevFin
+          abre = FALSE
+        END IF
+
+        ' Una sentencia que abre cuerpo se cuelga del nivel **anterior**, que es
+        ' el cuerpo que la contiene, no del suyo propio: la lista del cuerpo que
+        ' abre se escribe al cerrarse, y su `nFin` tampoco se sabe todavía.
+        ' Sin esto, un `FUNCTION` no aparecía en el `body` del `Program`.
+        IF pCola[nivelEnvio] = 0 THEN
+          pLista[nivelEnvio] = pLista[nivelEnvio] & STR(n)
+        ELSE
+          pLista[nivelEnvio] = pLista[nivelEnvio] & "," & STR(n)
+          nSiguiente[pCola[nivelEnvio]] = n
+        END IF
+        pCola[nivelEnvio] = n
+
+        ELSE
+          err = TRUE
+          errEn = pTok
+        END IF
+      END IF
+    END IF
+  END IF
+  END IF
+
+  ' Un cuerpo de una línea se cierra solo en cuanto tiene su sentencia, y esto
+  ' va **al final del bucle**: el cuerpo de un `IF x THEN PRINT "a"` lo cierra el
+  ' `PRINT`, que va por otra rama del despacho.
+  '
+  ' Y sólo si ya tiene alguna sentencia. Sin `pCola[nivel] <> 0` el cuerpo se
+  ' cerraba en la misma vuelta en que se abría, y el `then_body` salía vacío
+  ' mientras la sentencia de la línea se iba al cuerpo de fuera.
+  IF nivel > 0 AND pUno[nivel] <> 0 AND pCola[nivel] <> 0 THEN
+    cuerpoFin = pDueno[nivel]
+    listaTexto = pLista[nivel]
+    IF pCampo[nivel] = 2 THEN
+      cElseLista[cuerpoFin] = listaTexto
+    ELSE
+      cThenLista[cuerpoFin] = listaTexto
+    END IF
+    nivel = nivel - 1
+    nFin[cuerpoFin] = prevFin
+  END IF
+WEND
+
+' El `Program`. Su span va del primer token al último, y su cuerpo es 1..nnodo-1
+' porque las sentencias del programa se crean en orden y sin nada en medio.
+nIni[0] = tkCol[0]
+' El fin del `Program` es el **inicio** del `eof`, no su fin: el `eof` no
+' ocupa sitio, así que el final del programa es donde empieza el hueco que le
+' sigue. En `dim.ast` el último argumento acaba en 408 y el `Program` acaba en
+' 409, que es donde está el `eof`.
+nFin[0] = tkCol[tkN - 1]
+' La lista del programa ya está construida: se fue añadiendo en `cBodyLista`
+' según se parseaba cada sentencia, y no hace falta recorrer nada aquí.
+cBodyLista[0] = pLista[0]
+
+' ==========================================================================
+' El volcado. El formato es el de `sourc parse`: una línea por nodo, en
+' pre-orden, con el tipo, los dos spans del nodo y sus campos con nombre.
+'
+' El orden de los campos lo dicta el tipo del nodo, y por eso esto es un
+' `IF IF IF` y no una tabla. Es la contrapartida de lo que hace `astdump.FORMATO`
+' en el lado de Python: allí los campos se imprimen en el orden de declaración
+' porque el dataclass los tiene en ese orden y una tabla lo lee; aquí los
+' escribimos a mano y la tabla tendría que estar sincronizada con esta cadena de
+' condiciones. El golden es el que dice si las dos están sincronizadas.
+'
+' `Visible`, `RellenaDer` y `RellenaIzq` sí se reutilizan: son FUNCTION puras y
+' `lexador.src` va antepuesto en el mismo programa, así que están a la vista.
+' Eso es lo que hace la diferencia con el bloque de hoja, que sí había que
+' duplicar: aquéllas no tocan el estado.
+
+' Dos ayudantes puros, y puros de verdad: no tocan el estado, sólo lo que
+' reciben. Es lo que los hace legales donde el bloque de hoja no lo era.
+'
+' `Texto` es el "o no hay nodo": un índice 0 es `-` en el golden, y 0 es
+' también "ningún hijo". Que las dos cosas sean el mismo número es lo que
+' permite usar 0 como centinela, y que el golden lo imprima como `-` es lo que
+' lo hace legible.
+FUNCTION Texto(nodo AS INTEGER) AS STRING
+  IF nodo = 0 THEN
+    RETURN "-"
+  END IF
+  RETURN STR(nodo)
+END FUNCTION
+
+DIM salida AS STRING = ""
+DIM i AS INTEGER = 0
+DIM j AS INTEGER = 0
+DIM detalle AS STRING = ""
+
+FOR i = 0 TO nnodo - 1
+  detalle = ""
+  tipoT = nTipo[i]
+  IF tipoT = "Dim" THEN
+    detalle = "name=" & Visible(cNombre[i]) & " name_span=" & STR(cSpanIni[i]) & "-" & STR(cSpanFin[i]) & " type_ref=" & Texto(cTypeRef[i]) & " value=" & Texto(cValue[i])
+  ELSE IF tipoT = "TypeRef" THEN
+    detalle = "name=" & Visible(cNombre[i]) & " element=" & Texto(cElement[i])
+  ELSE IF tipoT = "NewArray" THEN
+    detalle = "type_name=" & Visible(cNombre[i]) & " count=" & Texto(cCount[i]) & " type_span=" & STR(cSpanIni[i]) & "-" & STR(cSpanFin[i])
+  ELSE IF tipoT = "Assign" THEN
+    detalle = "target=" & Texto(cTarget[i]) & " value=" & Texto(cValue[i])
+  ELSE IF tipoT = "Primitive" THEN
+    detalle = "name=" & Visible(cNombre[i]) & " args=" & cArgsLista[i] & " inline=" & STR(cLogico[i])
+  ELSE IF tipoT = "IntLit" OR tipoT = "FloatLit" THEN
+    detalle = "value=" & Visible(cLiteral[i])
+  ELSE IF tipoT = "StringLit" OR tipoT = "Name" THEN
+    detalle = "value=" & Visible(cTexto[i])
+  ELSE IF tipoT = "BoolLit" THEN
+    detalle = "value=" & STR(cLogico[i])
+  ELSE IF tipoT = "If" THEN
+    detalle = "condition=" & Texto(cCondition[i]) & " then_body=" & cThenLista[i] & " else_body=" & cElseLista[i] & " one_liner=" & STR(cLogico[i])
+  ELSE IF tipoT = "While" THEN
+    detalle = "condition=" & Texto(cCondition[i]) & " body=" & cBodyLista[i]
+  ELSE IF tipoT = "For" THEN
+    detalle = "var=" & Visible(cVar[i]) & " var_span=" & STR(cSpanIni[i]) & "-" & STR(cSpanFin[i]) & " start=" & Texto(cStart[i]) & " stop=" & Texto(cStop[i]) & " step=" & Texto(cStep[i]) & " body=" & cBodyLista[i]
+  ELSE IF tipoT = "FunctionDecl" THEN
+    detalle = "name=" & Visible(cNombre[i]) & " params=" & cParamsLista[i] & " return_type=" & Texto(cReturnType[i]) & " body=" & cBodyLista[i]
+  ELSE IF tipoT = "Return" THEN
+    detalle = "value=" & Texto(cValue[i])
+  ELSE IF tipoT = "Program" THEN
+    detalle = "body=" & cBodyLista[i]
+  ELSE
+    detalle = ""
+  END IF
+  salida = salida & RellenaDer(STR(i), 4) & " " & RellenaIzq(tipoT, 13) & " " & RellenaDer(STR(nIni[i]), 5) & " " & RellenaDer(STR(nFin[i]), 5) & " | " & detalle & NL
+NEXT i
+PRINT salida & NL & "; " & STR(nnodo) & " nodo(s)"

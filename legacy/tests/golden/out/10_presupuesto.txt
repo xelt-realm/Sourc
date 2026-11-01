@@ -1,0 +1,5 @@
+meses: 4
+ingresos: 13700
+gastos: 9700
+saldo: 4000
+promedio mensual: 3425

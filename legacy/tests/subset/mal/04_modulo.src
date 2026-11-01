@@ -1,0 +1,7 @@
+' `USE` e `IMPORT` traen otros ficheros, y esos ficheros tienen que estar en el
+' mismo nivel. El compilador en Source es un solo fichero --decisión de fase--,
+' así que ninguno de los dos está en el subconjunto.
+
+USE SOURCE_2D
+IMPORT FROM "utilidades/matematica.src"
+PRINT 1

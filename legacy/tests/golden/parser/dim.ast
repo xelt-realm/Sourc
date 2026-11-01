@@ -1,0 +1,34 @@
+   0 Program          51   409 | body=1,4,7,10,13,16,21,26
+   1 Dim             191   212 | name=a name_span=195-196 type_ref=2 value=3
+   2 TypeRef         200   207 | name=INTEGER element=-
+   3 IntLit          210   211 | value=7
+   4 Dim             212   234 | name=b name_span=216-217 type_ref=5 value=6
+   5 TypeRef         221   227 | name=SINGLE element=-
+   6 FloatLit        230   233 | value=1.5
+   7 Dim             234   260 | name=c name_span=238-239 type_ref=8 value=9
+   8 TypeRef         243   249 | name=STRING element=-
+   9 StringLit       253   259 | value=texto
+  10 Dim             260   284 | name=d name_span=264-265 type_ref=11 value=12
+  11 TypeRef         269   276 | name=BOOLEAN element=-
+  12 BoolLit         279   283 | value=1
+  13 Dim             284   305 | name=e name_span=288-289 type_ref=14 value=15
+  14 TypeRef         293   300 | name=INTEGER element=-
+  15 IntLit          303   304 | value=0
+  16 Dim             305   348 | name=f name_span=309-310 type_ref=17 value=19
+  17 TypeRef         314   319 | name=ARRAY element=18
+  18 TypeRef         323   330 | name=INTEGER element=-
+  19 NewArray        333   347 | type_name=INTEGER count=20 type_span=337-344
+  20 IntLit          345   346 | value=3
+  21 Dim             348   389 | name=g name_span=352-353 type_ref=22 value=24
+  22 TypeRef         357   362 | name=ARRAY element=23
+  23 TypeRef         366   372 | name=STRING element=-
+  24 NewArray        375   388 | type_name=STRING count=25 type_span=379-385
+  25 IntLit          386   387 | value=2
+  26 Primitive       389   409 | name=PRINT args=27,28,29,30,31 inline=1
+  27 Name            395   396 | value=a
+  28 Name            398   399 | value=b
+  29 Name            401   402 | value=c
+  30 Name            404   405 | value=d
+  31 Name            407   408 | value=e
+
+; 32 nodo(s)

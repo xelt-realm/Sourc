@@ -1,0 +1,97 @@
+' Operaciones que ningún otro programa del corpus toca.
+'
+' Existe por un motivo concreto: un backend puede tener una operación escrita y
+' ser falsa sin que nada lo note. Estas veinticuatro emisores se transcribieron y
+' nunca se ejecutaron, y el tripwire las contaba como "declaradas y sin
+' ejercitar", que es una afirmación y no un hecho.
+'
+' El bloque lleva en el comentario la operación que cubre, para que cuando algo
+' falle se sepa cuál sin compilar y mirar el IR.
+
+' ---- división entera: tres truncamientos distintos
+DIM n AS INTEGER = 7
+PRINT n / 2
+PRINT n MOD 2
+PRINT n \ 2
+PRINT n DIV 2
+PRINT -n DIV 2
+
+' ---- SINGLE: el otro ancho de punto flotante
+DIM s1 AS SINGLE = 6.0
+DIM s2 AS SINGLE = 4.0
+PRINT s1 + s2
+PRINT s1 - s2
+PRINT s1 * s2
+PRINT s1 / s2
+PRINT -s1
+PRINT s1 < s2
+PRINT s1 <= s2
+PRINT s1 > s2
+PRINT s1 >= s2
+
+' ---- DOUBLE: la aritmética completa
+DIM d1 AS DOUBLE = 6.0
+DIM d2 AS DOUBLE = 4.0
+PRINT d1 + d2
+PRINT d1 - d2
+PRINT d1 * d2
+PRINT d1 / d2
+PRINT d1 < d2
+PRINT d1 <= d2
+PRINT d1 > d2
+PRINT d1 >= d2
+PRINT FLOOR(2.7)
+PRINT d1 DIV d2
+PRINT d1 \ d2
+PRINT d1 MOD d2
+
+' ---- igualdad de flotantes: eq.f32 y eq.f64
+'
+' No es `eq` a secas. El `eq` sin sufijo elige opcode mirando el **destino**,
+' que es BOOLEAN y por tanto siempre i32, así que comparaba dos `f64` con
+' `i64.eq`. Eso compara bits, y comparar bits acierta casi siempre --dos números
+' iguales tienen los mismos bits-- y falla justo en los dos casos que define
+' IEEE: `0.0 = -0.0` son bits distintos y sale falso, y `NaN = NaN` son bits
+' iguales y sale verdadero. Los dos están al final.
+PRINT (s1 = s2)
+PRINT (s1 = 6.0)
+PRINT (s1 <> s2)
+PRINT (d1 = d2)
+PRINT (d1 = 6.0)
+PRINT (d1 <> d2)
+PRINT (0.0 = -0.0)
+PRINT (-0.0 <> 0.0)
+
+' ---- comparación de textos: igualdad y tres vías
+PRINT ("hola" = "hola")
+PRINT ("hola" = "adios")
+PRINT COMPARE("hola", "adios")
+PRINT COMPARE("adios", "hola")
+PRINT COMPARE("hola", "hola")
+
+' ---- verdad a partir de un entero
+DIM cierto AS BOOLEAN = 1
+PRINT cierto
+
+' ---- escribir un array entero
+DIM numeros AS ARRAY OF INTEGER = NEW INTEGER[3]
+numeros[0] = 1
+numeros[1] = 2
+PRINT numeros
+
+' ---- un array de arrays: el host necesita el tipo de cada elemento
+DIM tablero AS ARRAY OF ARRAY OF INTEGER = [ [1, 2], [3] ]
+PRINT tablero
+tablero[1][0] = 9
+PRINT tablero
+PRINT tablero[0][1]
+
+' ---- un array de arrays de textos
+DIM nombres AS ARRAY OF ARRAY OF STRING = [ ["uno"], ["dos", "tres"] ]
+PRINT nombres
+
+' ---- un array de un solo tipo, impreso entero
+DIM decimales AS ARRAY OF SINGLE = NEW SINGLE[2]
+decimales[0] = 1.5
+PRINT decimales
+

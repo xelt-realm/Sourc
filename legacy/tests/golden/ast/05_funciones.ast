@@ -1,0 +1,64 @@
+   0 Program          55   480 | body=1,8,29,36,40,44,48,52,54
+   1 FunctionDecl     56   126 | name=doble params=x:2 return_type=3 body=4
+   2 TypeRef          76    83 | name=INTEGER element=-
+   3 TypeRef          88    95 | name=INTEGER element=-
+   4 Return          100   113 | value=5
+   5 Binary          107   112 | op=* left=6 right=7
+   6 Name            107   108 | value=x
+   7 IntLit          111   112 | value=2
+   8 FunctionDecl    127   240 | name=fib params=n:9 return_type=10 body=11,17
+   9 TypeRef         145   152 | name=INTEGER element=-
+  10 TypeRef         157   164 | name=INTEGER element=-
+  11 If              169   192 | condition=12 then_body=15 else_body=- one_liner=1
+  12 Binary          172   177 | op=< left=13 right=14
+  13 Name            172   173 | value=n
+  14 IntLit          176   177 | value=2
+  15 Return          183   192 | value=16
+  16 Name            190   191 | value=n
+  17 Return          196   227 | value=18
+  18 Binary          203   226 | op=+ left=19 right=24
+  19 Call            203   213 | callee=20 args=21
+  20 Name            203   206 | value=fib
+  21 Binary          207   212 | op=- left=22 right=23
+  22 Name            207   208 | value=n
+  23 IntLit          211   212 | value=1
+  24 Call            216   226 | callee=25 args=26
+  25 Name            216   219 | value=fib
+  26 Binary          220   225 | op=- left=27 right=28
+  27 Name            220   221 | value=n
+  28 IntLit          224   225 | value=2
+  29 FunctionDecl    241   326 | name=saluda params=nombre:30 return_type=31 body=32
+  30 TypeRef         267   273 | name=STRING element=-
+  31 TypeRef         278   284 | name=STRING element=-
+  32 Return          289   313 | value=33
+  33 Binary          297   312 | op=& left=34 right=35
+  34 StringLit       297   303 | value=hola 
+  35 Name            306   312 | value=nombre
+  36 FunctionDecl    327   387 | name=avisa params= return_type=37 body=38
+  37 TypeRef         347   351 | name=VOID element=-
+  38 Primitive       356   374 | name=PRINT args=39 inline=0
+  39 StringLit       363   373 | value=  [aviso]
+  40 Primitive       388   404 | name=PRINT args=41 inline=0
+  41 Call            394   403 | callee=42 args=43
+  42 Name            394   399 | value=doble
+  43 IntLit          400   402 | value=21
+  44 Primitive       404   418 | name=PRINT args=45 inline=0
+  45 Call            410   417 | callee=46 args=47
+  46 Name            410   413 | value=fib
+  47 IntLit          414   416 | value=15
+  48 Primitive       418   440 | name=PRINT args=49 inline=0
+  49 Call            424   439 | callee=50 args=51
+  50 Name            424   430 | value=saluda
+  51 StringLit       432   438 | value=mundo
+  52 Call            440   447 | callee=53 args=
+  53 Name            440   445 | value=avisa
+  54 Primitive       448   480 | name=PRINT args=55 inline=0
+  55 Call            454   479 | callee=56 args=57
+  56 Name            454   457 | value=str
+  57 Call            458   478 | callee=58 args=59
+  58 Name            458   461 | value=len
+  59 Call            462   477 | callee=60 args=61
+  60 Name            462   468 | value=saluda
+  61 StringLit       470   476 | value=mundo
+
+; 62 nodo(s)

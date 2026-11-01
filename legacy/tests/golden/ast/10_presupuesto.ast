@@ -1,0 +1,90 @@
+   0 Program          68   679 | body=1,9,17,20,23,44,52,58,64,72,75,82
+   1 Dim              69   129 | name=ingresos name_span=73-81 type_ref=2 value=4
+   2 TypeRef          85    90 | name=ARRAY element=3
+   3 TypeRef          94   101 | name=INTEGER element=-
+   4 ArrayLit        104   128 | elements=5,6,7,8
+   5 IntLit          105   109 | value=3200
+   6 IntLit          111   115 | value=2800
+   7 IntLit          117   121 | value=4100
+   8 IntLit          123   127 | value=3600
+   9 Dim             129   187 | name=gastos name_span=133-139 type_ref=10 value=12
+  10 TypeRef         143   148 | name=ARRAY element=11
+  11 TypeRef         152   159 | name=INTEGER element=-
+  12 ArrayLit        162   186 | elements=13,14,15,16
+  13 IntLit          163   167 | value=2100
+  14 IntLit          169   173 | value=2600
+  15 IntLit          175   179 | value=1900
+  16 IntLit          181   185 | value=3100
+  17 Dim             188   222 | name=total_ingresos name_span=192-206 type_ref=18 value=19
+  18 TypeRef         210   217 | name=INTEGER element=-
+  19 IntLit          220   221 | value=0
+  20 Dim             222   254 | name=total_gastos name_span=226-238 type_ref=21 value=22
+  21 TypeRef         242   249 | name=INTEGER element=-
+  22 IntLit          252   253 | value=0
+  23 For             255   395 | var=mes var_span=259-262 start=24 stop=25 step=- body=30,37
+  24 IntLit          265   266 | value=0
+  25 Binary          270   287 | op=- left=26 right=29
+  26 Call            270   283 | callee=27 args=28
+  27 Name            270   273 | value=len
+  28 Name            274   282 | value=ingresos
+  29 IntLit          286   287 | value=1
+  30 Assign          292   340 | target=31 value=32
+  31 Name            292   306 | value=total_ingresos
+  32 Binary          309   338 | op=+ left=33 right=34
+  33 Name            309   323 | value=total_ingresos
+  34 Index           326   338 | target=35 index=36
+  35 Name            326   334 | value=ingresos
+  36 Name            335   338 | value=mes
+  37 Assign          344   386 | target=38 value=39
+  38 Name            344   356 | value=total_gastos
+  39 Binary          359   384 | op=+ left=40 right=41
+  40 Name            359   371 | value=total_gastos
+  41 Index           374   384 | target=42 index=43
+  42 Name            374   380 | value=gastos
+  43 Name            381   384 | value=mes
+  44 Primitive       396   433 | name=PRINT args=45 inline=0
+  45 Binary          403   432 | op=& left=46 right=47
+  46 StringLit       403   411 | value=meses: 
+  47 Call            414   432 | callee=48 args=49
+  48 Name            414   417 | value=str
+  49 Call            418   431 | callee=50 args=51
+  50 Name            418   421 | value=len
+  51 Name            422   430 | value=ingresos
+  52 Primitive       433   474 | name=PRINT args=53 inline=0
+  53 Binary          440   473 | op=& left=54 right=55
+  54 StringLit       440   451 | value=ingresos: 
+  55 Call            454   473 | callee=56 args=57
+  56 Name            454   457 | value=str
+  57 Name            458   472 | value=total_ingresos
+  58 Primitive       474   511 | name=PRINT args=59 inline=0
+  59 Binary          481   510 | op=& left=60 right=61
+  60 StringLit       481   490 | value=gastos: 
+  61 Call            493   510 | callee=62 args=63
+  62 Name            493   496 | value=str
+  63 Name            497   509 | value=total_gastos
+  64 Primitive       511   564 | name=PRINT args=65 inline=0
+  65 Binary          518   563 | op=& left=66 right=67
+  66 StringLit       518   526 | value=saldo: 
+  67 Call            529   563 | callee=68 args=69
+  68 Name            529   532 | value=str
+  69 Binary          533   562 | op=- left=70 right=71
+  70 Name            533   547 | value=total_ingresos
+  71 Name            550   562 | value=total_gastos
+  72 Dim             565   594 | name=promedio name_span=569-577 type_ref=73 value=74
+  73 TypeRef         581   587 | name=DOUBLE element=-
+  74 FloatLit        590   593 | value=0.0
+  75 Assign          594   636 | target=76 value=77
+  76 Name            594   602 | value=promedio
+  77 Binary          605   635 | op=\\ left=78 right=79
+  78 Name            605   619 | value=total_ingresos
+  79 Call            622   635 | callee=80 args=81
+  80 Name            622   625 | value=len
+  81 Name            626   634 | value=ingresos
+  82 Primitive       636   679 | name=PRINT args=83 inline=0
+  83 Binary          643   678 | op=& left=84 right=85
+  84 StringLit       643   662 | value=promedio mensual: 
+  85 Call            665   678 | callee=86 args=87
+  86 Name            665   668 | value=str
+  87 Name            669   677 | value=promedio
+
+; 88 nodo(s)

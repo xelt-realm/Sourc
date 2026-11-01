@@ -1,0 +1,30 @@
+' Textos: todo lo que hace falta para construir y comparar cadenas.
+'
+' La interpolación se resuelve en tiempo de compilación, así que no es una
+' operación de runtime -- es el lexer el que la parte. Eso significa que el
+' compilador en Source puede usarla sin necesitarla en el runtime.
+
+DIM a AS STRING = "hola"
+DIM b AS STRING = " mundo"
+
+PRINT a & b & "!"
+PRINT "interpolado: {a} y {1 + 2}"
+
+PRINT LEN(a)
+PRINT LENU("añó")
+PRINT CHARCODE(a, 1)
+' `CHR` es el otro lado de `CHARCODE` (ADR 0021): una cadena son
+' bytes, asi que construye de 0 a 255 y `LEN` de un byte alto es 1.
+PRINT CHR(97)
+PRINT LEN(CHR(233))
+
+PRINT LEFT(a, 3)
+PRINT RIGHT(a, 3)
+PRINT MID(a, 1, 3)   ' los indices son 0-based
+PRINT STR(42)
+PRINT VAL("17") + 1
+PRINT CONCAT(a, b)
+
+PRINT COMPARE(a, b)
+PRINT CONTAINS(a, "ol")
+PRINT INDEXOF(a, "l") + 1

@@ -1,0 +1,14 @@
+' Cada tipo, impreso.
+DIM entero AS INTEGER = 42
+DIM real AS SINGLE = 1.5
+DIM doble AS DOUBLE = 2.25
+DIM texto AS STRING = "hola"
+DIM verdad AS BOOLEAN = TRUE
+DIM tono AS COLOR = RGB(255, 200, 0)
+
+PRINT entero
+PRINT real
+PRINT doble
+PRINT texto
+PRINT verdad
+PRINT STR(tono)

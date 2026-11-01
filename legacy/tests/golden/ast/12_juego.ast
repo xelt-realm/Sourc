@@ -1,0 +1,106 @@
+   0 Program          61   563 | body=1,2,6,9,12,15,18,92,98
+   1 Use              62    76 | module=SOURCE_2D
+   2 Primitive        77   103 | name=SCREEN args=3,4,5 inline=0
+   3 IntLit           84    87 | value=320
+   4 IntLit           89    92 | value=240
+   5 StringLit        95   102 | value=prueba
+   6 Dim             104   127 | name=x name_span=108-109 type_ref=7 value=8
+   7 TypeRef         113   119 | name=SINGLE element=-
+   8 FloatLit        122   126 | value=32.0
+   9 Dim             127   150 | name=y name_span=131-132 type_ref=10 value=11
+  10 TypeRef         136   142 | name=SINGLE element=-
+  11 FloatLit        145   149 | value=32.0
+  12 Dim             150   173 | name=vx name_span=154-156 type_ref=13 value=14
+  13 TypeRef         160   166 | name=SINGLE element=-
+  14 FloatLit        169   172 | value=0.0
+  15 Dim             173   199 | name=frames name_span=177-183 type_ref=16 value=17
+  16 TypeRef         187   194 | name=INTEGER element=-
+  17 IntLit          197   198 | value=0
+  18 While           200   504 | condition=19 body=22,28,37,46,55,62,67,77,86,87
+  19 Binary          206   216 | op=< left=20 right=21
+  20 Name            206   212 | value=frames
+  21 IntLit          215   216 | value=4
+  22 Primitive       221   241 | name=CLS args=23 inline=0
+  23 Call            225   240 | callee=24 args=25,26,27
+  24 Name            225   228 | value=rgb
+  25 IntLit          229   231 | value=12
+  26 IntLit          233   235 | value=12
+  27 IntLit          237   239 | value=20
+  28 If              245   276 | condition=29 then_body=32 else_body=- one_liner=1
+  29 Call            248   256 | callee=30 args=31
+  30 Name            248   251 | value=key
+  31 StringLit       253   255 | value=d
+  32 Assign          262   276 | target=33 value=34
+  33 Name            262   264 | value=vx
+  34 Binary          267   275 | op=+ left=35 right=36
+  35 Name            267   269 | value=vx
+  36 FloatLit        272   275 | value=0.5
+  37 If              280   311 | condition=38 then_body=41 else_body=- one_liner=1
+  38 Call            283   291 | callee=39 args=40
+  39 Name            283   286 | value=key
+  40 StringLit       288   290 | value=a
+  41 Assign          297   311 | target=42 value=43
+  42 Name            297   299 | value=vx
+  43 Binary          302   310 | op=- left=44 right=45
+  44 Name            302   304 | value=vx
+  45 FloatLit        307   310 | value=0.5
+  46 If              315   343 | condition=47 then_body=51 else_body=- one_liner=1
+  47 Binary          318   327 | op=< left=48 right=49
+  48 Name            318   320 | value=vx
+  49 Unary           323   327 | op=- operand=50
+  50 FloatLit        324   327 | value=8.0
+  51 Assign          333   343 | target=52 value=53
+  52 Name            333   335 | value=vx
+  53 Unary           338   342 | op=- operand=54
+  54 FloatLit        339   342 | value=8.0
+  55 If              347   373 | condition=56 then_body=59 else_body=- one_liner=1
+  56 Binary          350   358 | op=> left=57 right=58
+  57 Name            350   352 | value=vx
+  58 FloatLit        355   358 | value=8.0
+  59 Assign          364   373 | target=60 value=61
+  60 Name            364   366 | value=vx
+  61 FloatLit        369   372 | value=8.0
+  62 Assign          377   388 | target=63 value=64
+  63 Name            377   378 | value=x
+  64 Binary          381   387 | op=+ left=65 right=66
+  65 Name            381   382 | value=x
+  66 Name            385   387 | value=vx
+  67 Primitive       392   429 | name=RECT args=68,69,70,71,72 inline=0
+  68 IntLit          397   398 | value=0
+  69 IntLit          400   401 | value=0
+  70 IntLit          403   406 | value=320
+  71 IntLit          408   411 | value=240
+  72 Call            413   428 | callee=73 args=74,75,76
+  73 Name            413   416 | value=rgb
+  74 IntLit          417   419 | value=12
+  75 IntLit          421   423 | value=12
+  76 IntLit          425   427 | value=20
+  77 Primitive       433   466 | name=CIRCLE args=78,79,80,81 inline=0
+  78 Name            440   441 | value=x
+  79 Name            443   444 | value=y
+  80 IntLit          446   447 | value=8
+  81 Call            449   465 | callee=82 args=83,84,85
+  82 Name            449   452 | value=rgb
+  83 IntLit          453   456 | value=255
+  84 IntLit          458   461 | value=200
+  85 IntLit          463   464 | value=0
+  86 Primitive       470   475 | name=FLIP args= inline=0
+  87 Assign          479   499 | target=88 value=89
+  88 Name            479   485 | value=frames
+  89 Binary          488   498 | op=+ left=90 right=91
+  90 Name            488   494 | value=frames
+  91 IntLit          497   498 | value=1
+  92 Primitive       505   536 | name=PRINT args=93 inline=0
+  93 Binary          512   535 | op=& left=94 right=95
+  94 StringLit       512   521 | value=frames: 
+  95 Call            524   535 | callee=96 args=97
+  96 Name            524   527 | value=str
+  97 Name            528   534 | value=frames
+  98 Primitive       536   563 | name=PRINT args=99 inline=0
+  99 Binary          543   562 | op=& left=100 right=101
+ 100 StringLit       543   553 | value=x final: 
+ 101 Call            556   562 | callee=102 args=103
+ 102 Name            556   559 | value=str
+ 103 Name            560   561 | value=x
+
+; 104 nodo(s)

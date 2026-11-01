@@ -1,0 +1,9 @@
+   0 Program          63    99 | body=1,4
+   1 Dim              64    85 | name=p name_span=68-69 type_ref=2 value=3
+   2 TypeRef          73    80 | name=INTEGER element=-
+   3 IntLit           83    84 | value=0
+   4 Primitive        85    99 | name=PRINT args=5 inline=0
+   5 Field            91    98 | target=6 name=campo
+   6 Name             91    92 | value=p
+
+; 7 nodo(s)

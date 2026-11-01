@@ -1,0 +1,2 @@
+frames: 5
+paredes vistas: 415

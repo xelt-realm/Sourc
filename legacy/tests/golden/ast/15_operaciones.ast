@@ -1,0 +1,252 @@
+   0 Program          55  2569 | body=1,4,8,12,16,20,25,28,31,35,39,43,47,50,54,58,62,66,69,72,76,80,84,88,92,96,100,104,108,112,116,120,124,128,132,136,140,144,149,154,158,162,167,172,177,180,182,187,192,197,199,209,211,218,220,226,236,238,243,248
+   1 Dim             528   549 | name=n name_span=532-533 type_ref=2 value=3
+   2 TypeRef         537   544 | name=INTEGER element=-
+   3 IntLit          547   548 | value=7
+   4 Primitive       549   561 | name=PRINT args=5 inline=0
+   5 Binary          555   560 | op=/ left=6 right=7
+   6 Name            555   556 | value=n
+   7 IntLit          559   560 | value=2
+   8 Primitive       561   575 | name=PRINT args=9 inline=0
+   9 Binary          567   574 | op=MOD left=10 right=11
+  10 Name            567   568 | value=n
+  11 IntLit          573   574 | value=2
+  12 Primitive       575   587 | name=PRINT args=13 inline=0
+  13 Binary          581   586 | op=\\ left=14 right=15
+  14 Name            581   582 | value=n
+  15 IntLit          585   586 | value=2
+  16 Primitive       587   601 | name=PRINT args=17 inline=0
+  17 Binary          593   600 | op=DIV left=18 right=19
+  18 Name            593   594 | value=n
+  19 IntLit          599   600 | value=2
+  20 Primitive       601   616 | name=PRINT args=21 inline=0
+  21 Binary          607   615 | op=DIV left=22 right=24
+  22 Unary           607   609 | op=- operand=23
+  23 Name            608   609 | value=n
+  24 IntLit          614   615 | value=2
+  25 Dim             664   687 | name=s1 name_span=668-670 type_ref=26 value=27
+  26 TypeRef         674   680 | name=SINGLE element=-
+  27 FloatLit        683   686 | value=6.0
+  28 Dim             687   710 | name=s2 name_span=691-693 type_ref=29 value=30
+  29 TypeRef         697   703 | name=SINGLE element=-
+  30 FloatLit        706   709 | value=4.0
+  31 Primitive       710   724 | name=PRINT args=32 inline=0
+  32 Binary          716   723 | op=+ left=33 right=34
+  33 Name            716   718 | value=s1
+  34 Name            721   723 | value=s2
+  35 Primitive       724   738 | name=PRINT args=36 inline=0
+  36 Binary          730   737 | op=- left=37 right=38
+  37 Name            730   732 | value=s1
+  38 Name            735   737 | value=s2
+  39 Primitive       738   752 | name=PRINT args=40 inline=0
+  40 Binary          744   751 | op=* left=41 right=42
+  41 Name            744   746 | value=s1
+  42 Name            749   751 | value=s2
+  43 Primitive       752   766 | name=PRINT args=44 inline=0
+  44 Binary          758   765 | op=/ left=45 right=46
+  45 Name            758   760 | value=s1
+  46 Name            763   765 | value=s2
+  47 Primitive       766   776 | name=PRINT args=48 inline=0
+  48 Unary           772   775 | op=- operand=49
+  49 Name            773   775 | value=s1
+  50 Primitive       776   790 | name=PRINT args=51 inline=0
+  51 Binary          782   789 | op=< left=52 right=53
+  52 Name            782   784 | value=s1
+  53 Name            787   789 | value=s2
+  54 Primitive       790   805 | name=PRINT args=55 inline=0
+  55 Binary          796   804 | op=<= left=56 right=57
+  56 Name            796   798 | value=s1
+  57 Name            802   804 | value=s2
+  58 Primitive       805   819 | name=PRINT args=59 inline=0
+  59 Binary          811   818 | op=> left=60 right=61
+  60 Name            811   813 | value=s1
+  61 Name            816   818 | value=s2
+  62 Primitive       819   834 | name=PRINT args=63 inline=0
+  63 Binary          825   833 | op=>= left=64 right=65
+  64 Name            825   827 | value=s1
+  65 Name            831   833 | value=s2
+  66 Dim             873   896 | name=d1 name_span=877-879 type_ref=67 value=68
+  67 TypeRef         883   889 | name=DOUBLE element=-
+  68 FloatLit        892   895 | value=6.0
+  69 Dim             896   919 | name=d2 name_span=900-902 type_ref=70 value=71
+  70 TypeRef         906   912 | name=DOUBLE element=-
+  71 FloatLit        915   918 | value=4.0
+  72 Primitive       919   933 | name=PRINT args=73 inline=0
+  73 Binary          925   932 | op=+ left=74 right=75
+  74 Name            925   927 | value=d1
+  75 Name            930   932 | value=d2
+  76 Primitive       933   947 | name=PRINT args=77 inline=0
+  77 Binary          939   946 | op=- left=78 right=79
+  78 Name            939   941 | value=d1
+  79 Name            944   946 | value=d2
+  80 Primitive       947   961 | name=PRINT args=81 inline=0
+  81 Binary          953   960 | op=* left=82 right=83
+  82 Name            953   955 | value=d1
+  83 Name            958   960 | value=d2
+  84 Primitive       961   975 | name=PRINT args=85 inline=0
+  85 Binary          967   974 | op=/ left=86 right=87
+  86 Name            967   969 | value=d1
+  87 Name            972   974 | value=d2
+  88 Primitive       975   989 | name=PRINT args=89 inline=0
+  89 Binary          981   988 | op=< left=90 right=91
+  90 Name            981   983 | value=d1
+  91 Name            986   988 | value=d2
+  92 Primitive       989  1004 | name=PRINT args=93 inline=0
+  93 Binary          995  1003 | op=<= left=94 right=95
+  94 Name            995   997 | value=d1
+  95 Name           1001  1003 | value=d2
+  96 Primitive      1004  1018 | name=PRINT args=97 inline=0
+  97 Binary         1010  1017 | op=> left=98 right=99
+  98 Name           1010  1012 | value=d1
+  99 Name           1015  1017 | value=d2
+ 100 Primitive      1018  1033 | name=PRINT args=101 inline=0
+ 101 Binary         1024  1032 | op=>= left=102 right=103
+ 102 Name           1024  1026 | value=d1
+ 103 Name           1030  1032 | value=d2
+ 104 Primitive      1033  1050 | name=PRINT args=105 inline=0
+ 105 Call           1039  1049 | callee=106 args=107
+ 106 Name           1039  1044 | value=floor
+ 107 FloatLit       1045  1048 | value=2.7
+ 108 Primitive      1050  1066 | name=PRINT args=109 inline=0
+ 109 Binary         1056  1065 | op=DIV left=110 right=111
+ 110 Name           1056  1058 | value=d1
+ 111 Name           1063  1065 | value=d2
+ 112 Primitive      1066  1080 | name=PRINT args=113 inline=0
+ 113 Binary         1072  1079 | op=\\ left=114 right=115
+ 114 Name           1072  1074 | value=d1
+ 115 Name           1077  1079 | value=d2
+ 116 Primitive      1080  1096 | name=PRINT args=117 inline=0
+ 117 Binary         1086  1095 | op=MOD left=118 right=119
+ 118 Name           1086  1088 | value=d1
+ 119 Name           1093  1095 | value=d2
+ 120 Primitive      1584  1600 | name=PRINT args=121 inline=0
+ 121 Binary         1591  1598 | op== left=122 right=123
+ 122 Name           1591  1593 | value=s1
+ 123 Name           1596  1598 | value=s2
+ 124 Primitive      1600  1617 | name=PRINT args=125 inline=0
+ 125 Binary         1607  1615 | op== left=126 right=127
+ 126 Name           1607  1609 | value=s1
+ 127 FloatLit       1612  1615 | value=6.0
+ 128 Primitive      1617  1634 | name=PRINT args=129 inline=0
+ 129 Binary         1624  1632 | op=<> left=130 right=131
+ 130 Name           1624  1626 | value=s1
+ 131 Name           1630  1632 | value=s2
+ 132 Primitive      1634  1650 | name=PRINT args=133 inline=0
+ 133 Binary         1641  1648 | op== left=134 right=135
+ 134 Name           1641  1643 | value=d1
+ 135 Name           1646  1648 | value=d2
+ 136 Primitive      1650  1667 | name=PRINT args=137 inline=0
+ 137 Binary         1657  1665 | op== left=138 right=139
+ 138 Name           1657  1659 | value=d1
+ 139 FloatLit       1662  1665 | value=6.0
+ 140 Primitive      1667  1684 | name=PRINT args=141 inline=0
+ 141 Binary         1674  1682 | op=<> left=142 right=143
+ 142 Name           1674  1676 | value=d1
+ 143 Name           1680  1682 | value=d2
+ 144 Primitive      1684  1703 | name=PRINT args=145 inline=0
+ 145 Binary         1691  1701 | op== left=146 right=147
+ 146 FloatLit       1691  1694 | value=0.0
+ 147 Unary          1697  1701 | op=- operand=148
+ 148 FloatLit       1698  1701 | value=0.0
+ 149 Primitive      1703  1723 | name=PRINT args=150 inline=0
+ 150 Binary         1710  1721 | op=<> left=151 right=153
+ 151 Unary          1710  1714 | op=- operand=152
+ 152 FloatLit       1711  1714 | value=0.0
+ 153 FloatLit       1718  1721 | value=0.0
+ 154 Primitive      1775  1799 | name=PRINT args=155 inline=0
+ 155 Binary         1783  1797 | op== left=156 right=157
+ 156 StringLit      1783  1788 | value=hola
+ 157 StringLit      1792  1797 | value=hola
+ 158 Primitive      1799  1824 | name=PRINT args=159 inline=0
+ 159 Binary         1807  1822 | op== left=160 right=161
+ 160 StringLit      1807  1812 | value=hola
+ 161 StringLit      1816  1822 | value=adios
+ 162 Primitive      1824  1855 | name=PRINT args=163 inline=0
+ 163 Call           1830  1854 | callee=164 args=165,166
+ 164 Name           1830  1837 | value=compare
+ 165 StringLit      1839  1844 | value=hola
+ 166 StringLit      1847  1853 | value=adios
+ 167 Primitive      1855  1886 | name=PRINT args=168 inline=0
+ 168 Call           1861  1885 | callee=169 args=170,171
+ 169 Name           1861  1868 | value=compare
+ 170 StringLit      1870  1876 | value=adios
+ 171 StringLit      1879  1884 | value=hola
+ 172 Primitive      1886  1916 | name=PRINT args=173 inline=0
+ 173 Call           1892  1915 | callee=174 args=175,176
+ 174 Name           1892  1899 | value=compare
+ 175 StringLit      1901  1906 | value=hola
+ 176 StringLit      1909  1914 | value=hola
+ 177 Dim            1953  1979 | name=cierto name_span=1957-1963 type_ref=178 value=179
+ 178 TypeRef        1967  1974 | name=BOOLEAN element=-
+ 179 IntLit         1977  1978 | value=1
+ 180 Primitive      1979  1992 | name=PRINT args=181 inline=0
+ 181 Name           1985  1991 | value=cierto
+ 182 Dim            2025  2074 | name=numeros name_span=2029-2036 type_ref=183 value=185
+ 183 TypeRef        2040  2045 | name=ARRAY element=184
+ 184 TypeRef        2049  2056 | name=INTEGER element=-
+ 185 NewArray       2059  2073 | type_name=INTEGER count=186 type_span=2063-2070
+ 186 IntLit         2071  2072 | value=3
+ 187 Assign         2074  2089 | target=188 value=191
+ 188 Index          2074  2083 | target=189 index=190
+ 189 Name           2074  2081 | value=numeros
+ 190 IntLit         2082  2083 | value=0
+ 191 IntLit         2087  2088 | value=1
+ 192 Assign         2089  2104 | target=193 value=196
+ 193 Index          2089  2098 | target=194 index=195
+ 194 Name           2089  2096 | value=numeros
+ 195 IntLit         2097  2098 | value=1
+ 196 IntLit         2102  2103 | value=2
+ 197 Primitive      2104  2118 | name=PRINT args=198 inline=0
+ 198 Name           2110  2117 | value=numeros
+ 199 Dim            2188  2247 | name=tablero name_span=2192-2199 type_ref=200 value=203
+ 200 TypeRef        2203  2208 | name=ARRAY element=201
+ 201 TypeRef        2212  2217 | name=ARRAY element=202
+ 202 TypeRef        2221  2228 | name=INTEGER element=-
+ 203 ArrayLit       2231  2246 | elements=204,207
+ 204 ArrayLit       2233  2239 | elements=205,206
+ 205 IntLit         2234  2235 | value=1
+ 206 IntLit         2237  2238 | value=2
+ 207 ArrayLit       2241  2244 | elements=208
+ 208 IntLit         2242  2243 | value=3
+ 209 Primitive      2247  2261 | name=PRINT args=210 inline=0
+ 210 Name           2253  2260 | value=tablero
+ 211 Assign         2261  2279 | target=212 value=217
+ 212 Index          2261  2273 | target=213 index=216
+ 213 Index          2261  2270 | target=214 index=215
+ 214 Name           2261  2268 | value=tablero
+ 215 IntLit         2269  2270 | value=1
+ 216 IntLit         2272  2273 | value=0
+ 217 IntLit         2277  2278 | value=9
+ 218 Primitive      2279  2293 | name=PRINT args=219 inline=0
+ 219 Name           2285  2292 | value=tablero
+ 220 Primitive      2293  2313 | name=PRINT args=221 inline=0
+ 221 Index          2299  2311 | target=222 index=225
+ 222 Index          2299  2308 | target=223 index=224
+ 223 Name           2299  2306 | value=tablero
+ 224 IntLit         2307  2308 | value=0
+ 225 IntLit         2310  2311 | value=1
+ 226 Dim            2350  2421 | name=nombres name_span=2354-2361 type_ref=227 value=230
+ 227 TypeRef        2365  2370 | name=ARRAY element=228
+ 228 TypeRef        2374  2379 | name=ARRAY element=229
+ 229 TypeRef        2383  2389 | name=STRING element=-
+ 230 ArrayLit       2392  2420 | elements=231,233
+ 231 ArrayLit       2394  2401 | elements=232
+ 232 StringLit      2396  2400 | value=uno
+ 233 ArrayLit       2403  2418 | elements=234,235
+ 234 StringLit      2405  2409 | value=dos
+ 235 StringLit      2412  2417 | value=tres
+ 236 Primitive      2421  2435 | name=PRINT args=237 inline=0
+ 237 Name           2427  2434 | value=nombres
+ 238 Dim            2484  2533 | name=decimales name_span=2488-2497 type_ref=239 value=241
+ 239 TypeRef        2501  2506 | name=ARRAY element=240
+ 240 TypeRef        2510  2516 | name=SINGLE element=-
+ 241 NewArray       2519  2532 | type_name=SINGLE count=242 type_span=2523-2529
+ 242 IntLit         2530  2531 | value=2
+ 243 Assign         2533  2552 | target=244 value=247
+ 244 Index          2533  2544 | target=245 index=246
+ 245 Name           2533  2542 | value=decimales
+ 246 IntLit         2543  2544 | value=0
+ 247 FloatLit       2548  2551 | value=1.5
+ 248 Primitive      2552  2568 | name=PRINT args=249 inline=0
+ 249 Name           2558  2567 | value=decimales
+
+; 250 nodo(s)

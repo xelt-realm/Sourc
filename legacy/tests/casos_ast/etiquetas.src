@@ -1,0 +1,10 @@
+' GOTO y GOSUB parsean y no bajan a IR (E0043).
+GOTO salto
+salto:
+PRINT 1
+GOSUB rutina
+GOTO fin
+rutina:
+PRINT 2
+fin:
+PRINT 3

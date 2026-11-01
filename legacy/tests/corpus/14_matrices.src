@@ -1,0 +1,14 @@
+' Multiplicación de una matriz 2x2 con un vector, al estilo del runtime 3D.
+' VEC/MAT llegan en la Fase 4; aquí se ve el algoritmo con escalares.
+DIM m00 AS SINGLE = 2.0
+DIM m01 AS SINGLE = 1.0
+DIM m10 AS SINGLE = 3.0
+DIM m11 AS SINGLE = 4.0
+DIM px AS SINGLE = 5.0
+DIM py AS SINGLE = 6.0
+
+DIM rx AS SINGLE = m00 * px + m01 * py
+DIM ry AS SINGLE = m10 * px + m11 * py
+PRINT STR(rx)
+PRINT STR(ry)
+PRINT STR(SQRT(rx * rx + ry * ry))

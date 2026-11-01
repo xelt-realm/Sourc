@@ -1,0 +1,10 @@
+' Una FUNCTION con RETURN con valor y sin él.
+' El `params` de `FunctionDecl` es el único campo del AST que es una lista de
+' (nombre, tipo) y no de índices, así que es lo que de verdad prueba que un
+' array de nombres puede ir alineado con otro de índices.
+Function Doble(x As Integer) As Integer
+  RETURN x
+END FUNCTION
+Function Aviso()
+  RETURN
+END FUNCTION

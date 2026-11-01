@@ -1,0 +1,14 @@
+' Cabecera, tipos y valores. Todo lo que el compilador necesita para sus datos.
+
+DIM entero AS INTEGER = 7
+DIM real AS DOUBLE = 1.5
+DIM chico AS SINGLE = 0.5
+DIM cierto AS BOOLEAN = TRUE
+DIM nombre AS STRING = "sourc"
+' `color` es palabra clave: es la sentencia de paleta (ADR 0005), así que
+' no puede ser nombre de variable. Por eso la variable se llama `tinte`.
+DIM tinte AS COLOR = RGB(255, 0, 0)
+DIM sin_tipo = 3   ' tipo inferido
+
+PRINT entero; " "; real; " "; chico; " "; cierto; " "; nombre; " "; tinte
+PRINT sin_tipo

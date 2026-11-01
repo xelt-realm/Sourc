@@ -1,0 +1,5 @@
+' `NEW T[n, m]` no parsea: el parser espera un único tamaño entre corchetes.
+' Los arrays multidimensionales son entregable de la Fase 4.
+
+DIM tabla AS ARRAY OF INTEGER = NEW INTEGER[2, 3]
+PRINT tabla[1, 2]

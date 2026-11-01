@@ -1,0 +1,74 @@
+   0 Program          73   763 | body=1,2,15,18,21,60,66
+   1 Use             149   163 | module=SOURCE_2D
+   2 Dim             164   413 | name=mapa name_span=168-172 type_ref=3 value=5
+   3 TypeRef         176   181 | name=ARRAY element=4
+   4 TypeRef         185   191 | name=STRING element=-
+   5 ArrayLit        194   412 | elements=6,7,8,9,10,11,12,13,14
+   6 StringLit       201   218 | value=################
+   7 StringLit       225   242 | value=#..............#
+   8 StringLit       249   266 | value=#.####.#####.#.#
+   9 StringLit       273   290 | value=#.#..#.#...#.#.#
+  10 StringLit       297   314 | value=#.#.##.#.#.#.#.#
+  11 StringLit       321   338 | value=#.#....#.#...#.#
+  12 StringLit       345   362 | value=#.######.#####.#
+  13 StringLit       369   386 | value=#..............#
+  14 StringLit       393   410 | value=################
+  15 Dim             414   440 | name=celdas name_span=418-424 type_ref=16 value=17
+  16 TypeRef         428   435 | name=INTEGER element=-
+  17 IntLit          438   439 | value=0
+  18 Dim             440   466 | name=frames name_span=444-450 type_ref=19 value=20
+  19 TypeRef         454   461 | name=INTEGER element=-
+  20 IntLit          464   465 | value=0
+  21 While           467   692 | condition=22 body=25,54,59
+  22 Binary          473   483 | op=< left=23 right=24
+  23 Name            473   479 | value=frames
+  24 IntLit          482   483 | value=5
+  25 For             488   654 | var=fila var_span=492-496 start=26 stop=27 step=- body=32
+  26 IntLit          499   500 | value=0
+  27 Binary          504   517 | op=- left=28 right=31
+  28 Call            504   513 | callee=29 args=30
+  29 Name            504   507 | value=len
+  30 Name            508   512 | value=mapa
+  31 IntLit          516   517 | value=1
+  32 For             526   640 | var=col var_span=530-533 start=33 stop=34 step=- body=41
+  33 IntLit          536   537 | value=0
+  34 Binary          541   560 | op=- left=35 right=40
+  35 Call            541   556 | callee=36 args=37
+  36 Name            541   544 | value=len
+  37 Index           545   554 | target=38 index=39
+  38 Name            545   549 | value=mapa
+  39 Name            550   554 | value=fila
+  40 IntLit          559   560 | value=1
+  41 If              573   623 | condition=42 then_body=49 else_body=- one_liner=1
+  42 Binary          576   597 | op== left=43 right=48
+  43 Index           576   590 | target=44 index=47
+  44 Index           576   585 | target=45 index=46
+  45 Name            576   580 | value=mapa
+  46 Name            581   585 | value=fila
+  47 Name            587   590 | value=col
+  48 StringLit       595   597 | value=#
+  49 Assign          603   623 | target=50 value=51
+  50 Name            603   609 | value=celdas
+  51 Binary          612   622 | op=+ left=52 right=53
+  52 Name            612   618 | value=celdas
+  53 IntLit          621   622 | value=1
+  54 Assign          658   678 | target=55 value=56
+  55 Name            658   664 | value=frames
+  56 Binary          667   677 | op=+ left=57 right=58
+  57 Name            667   673 | value=frames
+  58 IntLit          676   677 | value=1
+  59 Primitive       682   687 | name=FLIP args= inline=0
+  60 Primitive       693   724 | name=PRINT args=61 inline=0
+  61 Binary          700   723 | op=& left=62 right=63
+  62 StringLit       700   709 | value=frames: 
+  63 Call            712   723 | callee=64 args=65
+  64 Name            712   715 | value=str
+  65 Name            716   722 | value=frames
+  66 Primitive       724   763 | name=PRINT args=67 inline=0
+  67 Binary          731   762 | op=& left=68 right=69
+  68 StringLit       731   748 | value=paredes vistas: 
+  69 Call            751   762 | callee=70 args=71
+  70 Name            751   754 | value=str
+  71 Name            755   761 | value=celdas
+
+; 72 nodo(s)

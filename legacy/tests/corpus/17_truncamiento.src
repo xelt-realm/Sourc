@@ -1,0 +1,37 @@
+' División entera: las dos truncaciones y por qué hay que probarlas por separado.
+'
+' `\` trunca hacia CERO y `DIV` hacia menos infinito (GRAMMAR.md 3.2). Con
+' dividendo positivo las dos dan lo mismo, y por eso durante mucho tiempo ningún
+' test las distinguió: `03_aritmetica` sólo divide 7 entre 2.
+'
+' El backend delegaba `\` en `divfloor.i64` --porque el intérprete usaba la misma
+' división para los dos operadores-- y el comentario de esa línea decía, en
+' letras, que si algún día se separaban "este es el sitio donde se rompen las
+' dos".
+'
+' Se separaron. `PRINT -9 \ 2` daba -5 en el módulo y -4 en el intérprete, con
+' 425 tests en verde. Lo encontró el fuzzer diferencial comparando las dos
+' salidas de un programa que dividía un número negativo sin haberlo planeado, y
+' no un test de ejemplo: ningún ejemplo del repo dividía un negativo.
+'
+' Este programa existe para que el próximo caso parecido lo encuentre un golden.
+DIM neg AS INTEGER = -9
+DIM dos AS INTEGER = 2
+
+' ---- hacia cero
+PRINT neg \ dos
+PRINT neg \ neg
+PRINT (0 - neg) \ dos
+
+' ---- hacia menos infinito
+PRINT neg DIV dos
+PRINT neg DIV neg
+
+' ---- el signo del resto va con el dividendo
+PRINT neg MOD dos
+PRINT (0 - neg) MOD dos
+
+' ---- y con flotantes, que es donde el error se nota más
+PRINT -9.5 \ 2
+PRINT -9.5 DIV 2
+PRINT -9.5 MOD 2

@@ -1,0 +1,102 @@
+   0 Program          70  3178 | body=1,5,8,12,16,20,25,30,35,40,45,51,57,63,68,73,77,81,87,94
+   1 Dim            1668  1697 | name=negativo name_span=1672-1680 type_ref=2 value=3
+   2 TypeRef        1684  1691 | name=INTEGER element=-
+   3 Unary          1694  1696 | op=- operand=4
+   4 IntLit         1695  1696 | value=5
+   5 Dim            1697  1725 | name=positivo name_span=1701-1709 type_ref=6 value=7
+   6 TypeRef        1713  1720 | name=INTEGER element=-
+   7 IntLit         1723  1724 | value=3
+   8 Primitive      1726  1746 | name=PRINT args=9 inline=0
+   9 Call           1732  1745 | callee=10 args=11
+  10 Name           1732  1735 | value=abs
+  11 Name           1736  1744 | value=negativo
+  12 Primitive      1746  1766 | name=PRINT args=13 inline=0
+  13 Call           1752  1765 | callee=14 args=15
+  14 Name           1752  1755 | value=abs
+  15 Name           1756  1764 | value=positivo
+  16 Primitive      1766  1779 | name=PRINT args=17 inline=0
+  17 Call           1772  1778 | callee=18 args=19
+  18 Name           1772  1775 | value=abs
+  19 IntLit         1776  1777 | value=0
+  20 Primitive      1779  1795 | name=PRINT args=21 inline=0
+  21 Call           1785  1794 | callee=22 args=23
+  22 Name           1785  1788 | value=abs
+  23 Unary          1789  1793 | op=- operand=24
+  24 FloatLit       1790  1793 | value=2.5
+  25 Primitive      2033  2063 | name=PRINT args=26 inline=0
+  26 Call           2039  2062 | callee=27 args=28,29
+  27 Name           2039  2042 | value=min
+  28 Name           2043  2051 | value=positivo
+  29 Name           2053  2061 | value=negativo
+  30 Primitive      2063  2093 | name=PRINT args=31 inline=0
+  31 Call           2069  2092 | callee=32 args=33,34
+  32 Name           2069  2072 | value=max
+  33 Name           2073  2081 | value=positivo
+  34 Name           2083  2091 | value=negativo
+  35 Primitive      2093  2111 | name=PRINT args=36 inline=0
+  36 Call           2099  2110 | callee=37 args=38,39
+  37 Name           2099  2102 | value=min
+  38 FloatLit       2103  2106 | value=1.5
+  39 IntLit         2108  2109 | value=2
+  40 Primitive      2111  2129 | name=PRINT args=41 inline=0
+  41 Call           2117  2128 | callee=42 args=43,44
+  42 Name           2117  2120 | value=max
+  43 IntLit         2121  2122 | value=1
+  44 FloatLit       2124  2127 | value=3.5
+  45 Primitive      2359  2387 | name=PRINT args=46 inline=0
+  46 Call           2365  2386 | callee=47 args=48,49,50
+  47 Name           2365  2370 | value=clamp
+  48 IntLit         2371  2372 | value=1
+  49 Name           2374  2382 | value=positivo
+  50 IntLit         2384  2385 | value=9
+  51 Primitive      2387  2408 | name=PRINT args=52 inline=0
+  52 Call           2393  2407 | callee=53 args=54,55,56
+  53 Name           2393  2398 | value=clamp
+  54 IntLit         2399  2400 | value=5
+  55 IntLit         2402  2403 | value=1
+  56 IntLit         2405  2406 | value=3
+  57 Primitive      2408  2431 | name=PRINT args=58 inline=0
+  58 Call           2414  2430 | callee=59 args=60,61,62
+  59 Name           2414  2419 | value=clamp
+  60 IntLit         2420  2421 | value=1
+  61 FloatLit       2423  2426 | value=2.5
+  62 IntLit         2428  2429 | value=3
+  63 Primitive      2753  2772 | name=PRINT args=64 inline=0
+  64 Binary         2760  2770 | op== left=65 right=66
+  65 FloatLit       2760  2763 | value=0.0
+  66 Unary          2766  2770 | op=- operand=67
+  67 FloatLit       2767  2770 | value=0.0
+  68 Primitive      2772  2792 | name=PRINT args=69 inline=0
+  69 Binary         2779  2790 | op=<> left=70 right=72
+  70 Unary          2779  2783 | op=- operand=71
+  71 FloatLit       2780  2783 | value=0.0
+  72 FloatLit       2787  2790 | value=0.0
+  73 Primitive      3085  3099 | name=PRINT args=74 inline=0
+  74 Call           3091  3098 | callee=75 args=76
+  75 Name           3091  3094 | value=chr
+  76 IntLit         3095  3097 | value=65
+  77 Primitive      3099  3113 | name=PRINT args=78 inline=0
+  78 Call           3105  3112 | callee=79 args=80
+  79 Name           3105  3108 | value=chr
+  80 IntLit         3109  3111 | value=10
+  81 Primitive      3113  3133 | name=PRINT args=82 inline=0
+  82 Call           3119  3132 | callee=83 args=84
+  83 Name           3119  3122 | value=len
+  84 Call           3123  3131 | callee=85 args=86
+  85 Name           3123  3126 | value=chr
+  86 IntLit         3127  3130 | value=233
+  87 Primitive      3133  3160 | name=PRINT args=88 inline=0
+  88 Call           3139  3159 | callee=89 args=90,93
+  89 Name           3139  3147 | value=charcode
+  90 Call           3148  3155 | callee=91 args=92
+  91 Name           3148  3151 | value=chr
+  92 IntLit         3152  3154 | value=65
+  93 IntLit         3157  3158 | value=0
+  94 Primitive      3160  3178 | name=PRINT args=95 inline=0
+  95 Call           3166  3177 | callee=96 args=97
+  96 Name           3166  3169 | value=len
+  97 Call           3170  3176 | callee=98 args=99
+  98 Name           3170  3173 | value=chr
+  99 IntLit         3174  3175 | value=0
+
+; 100 nodo(s)

@@ -1,0 +1,39 @@
+   0 Program          21   274 | body=1,4,7,10,13,16,23,25,27,29,31,33
+   1 Dim              22    49 | name=entero name_span=26-32 type_ref=2 value=3
+   2 TypeRef          36    43 | name=INTEGER element=-
+   3 IntLit           46    48 | value=42
+   4 Dim              49    74 | name=real name_span=53-57 type_ref=5 value=6
+   5 TypeRef          61    67 | name=SINGLE element=-
+   6 FloatLit         70    73 | value=1.5
+   7 Dim              74   101 | name=doble name_span=78-83 type_ref=8 value=9
+   8 TypeRef          87    93 | name=DOUBLE element=-
+   9 FloatLit         96   100 | value=2.25
+  10 Dim             101   130 | name=texto name_span=105-110 type_ref=11 value=12
+  11 TypeRef         114   120 | name=STRING element=-
+  12 StringLit       124   129 | value=hola
+  13 Dim             130   159 | name=verdad name_span=134-140 type_ref=14 value=15
+  14 TypeRef         144   151 | name=BOOLEAN element=-
+  15 BoolLit         154   158 | value=1
+  16 Dim             159   196 | name=tono name_span=163-167 type_ref=17 value=18
+  17 TypeRef         171   176 | name=COLOR element=-
+  18 Call            179   195 | callee=19 args=20,21,22
+  19 Name            179   182 | value=rgb
+  20 IntLit          183   186 | value=255
+  21 IntLit          188   191 | value=200
+  22 IntLit          193   194 | value=0
+  23 Primitive       197   210 | name=PRINT args=24 inline=0
+  24 Name            203   209 | value=entero
+  25 Primitive       210   221 | name=PRINT args=26 inline=0
+  26 Name            216   220 | value=real
+  27 Primitive       221   233 | name=PRINT args=28 inline=0
+  28 Name            227   232 | value=doble
+  29 Primitive       233   245 | name=PRINT args=30 inline=0
+  30 Name            239   244 | value=texto
+  31 Primitive       245   258 | name=PRINT args=32 inline=0
+  32 Name            251   257 | value=verdad
+  33 Primitive       258   274 | name=PRINT args=34 inline=0
+  34 Call            264   273 | callee=35 args=36
+  35 Name            264   267 | value=str
+  36 Name            268   272 | value=tono
+
+; 37 nodo(s)

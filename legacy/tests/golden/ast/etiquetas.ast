@@ -1,0 +1,15 @@
+   0 Program          47   125 | body=1,2,3,5,6,7,8,10,11
+   1 Goto             48    59 | label=salto
+   2 Label            59    65 | name=salto
+   3 Primitive        66    74 | name=PRINT args=4 inline=0
+   4 IntLit           72    73 | value=1
+   5 Gosub            74    87 | label=rutina
+   6 Goto             87    96 | label=fin
+   7 Label            96   103 | name=rutina
+   8 Primitive       104   112 | name=PRINT args=9 inline=0
+   9 IntLit          110   111 | value=2
+  10 Label           112   116 | name=fin
+  11 Primitive       117   125 | name=PRINT args=12 inline=0
+  12 IntLit          123   124 | value=3
+
+; 13 nodo(s)

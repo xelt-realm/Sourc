@@ -1,0 +1,59 @@
+   0 Program          75   430 | body=1,4,7,10,13,16,19,28,37,41,45
+   1 Dim             146   170 | name=m00 name_span=150-153 type_ref=2 value=3
+   2 TypeRef         157   163 | name=SINGLE element=-
+   3 FloatLit        166   169 | value=2.0
+   4 Dim             170   194 | name=m01 name_span=174-177 type_ref=5 value=6
+   5 TypeRef         181   187 | name=SINGLE element=-
+   6 FloatLit        190   193 | value=1.0
+   7 Dim             194   218 | name=m10 name_span=198-201 type_ref=8 value=9
+   8 TypeRef         205   211 | name=SINGLE element=-
+   9 FloatLit        214   217 | value=3.0
+  10 Dim             218   242 | name=m11 name_span=222-225 type_ref=11 value=12
+  11 TypeRef         229   235 | name=SINGLE element=-
+  12 FloatLit        238   241 | value=4.0
+  13 Dim             242   265 | name=px name_span=246-248 type_ref=14 value=15
+  14 TypeRef         252   258 | name=SINGLE element=-
+  15 FloatLit        261   264 | value=5.0
+  16 Dim             265   288 | name=py name_span=269-271 type_ref=17 value=18
+  17 TypeRef         275   281 | name=SINGLE element=-
+  18 FloatLit        284   287 | value=6.0
+  19 Dim             289   328 | name=rx name_span=293-295 type_ref=20 value=21
+  20 TypeRef         299   305 | name=SINGLE element=-
+  21 Binary          308   327 | op=+ left=22 right=25
+  22 Binary          308   316 | op=* left=23 right=24
+  23 Name            308   311 | value=m00
+  24 Name            314   316 | value=px
+  25 Binary          319   327 | op=* left=26 right=27
+  26 Name            319   322 | value=m01
+  27 Name            325   327 | value=py
+  28 Dim             328   367 | name=ry name_span=332-334 type_ref=29 value=30
+  29 TypeRef         338   344 | name=SINGLE element=-
+  30 Binary          347   366 | op=+ left=31 right=34
+  31 Binary          347   355 | op=* left=32 right=33
+  32 Name            347   350 | value=m10
+  33 Name            353   355 | value=px
+  34 Binary          358   366 | op=* left=35 right=36
+  35 Name            358   361 | value=m11
+  36 Name            364   366 | value=py
+  37 Primitive       367   381 | name=PRINT args=38 inline=0
+  38 Call            373   380 | callee=39 args=40
+  39 Name            373   376 | value=str
+  40 Name            377   379 | value=rx
+  41 Primitive       381   395 | name=PRINT args=42 inline=0
+  42 Call            387   394 | callee=43 args=44
+  43 Name            387   390 | value=str
+  44 Name            391   393 | value=ry
+  45 Primitive       395   430 | name=PRINT args=46 inline=0
+  46 Call            401   429 | callee=47 args=48
+  47 Name            401   404 | value=str
+  48 Call            405   428 | callee=49 args=50
+  49 Name            405   409 | value=sqrt
+  50 Binary          410   427 | op=+ left=51 right=54
+  51 Binary          410   417 | op=* left=52 right=53
+  52 Name            410   412 | value=rx
+  53 Name            415   417 | value=rx
+  54 Binary          420   427 | op=* left=55 right=56
+  55 Name            420   422 | value=ry
+  56 Name            425   427 | value=ry
+
+; 57 nodo(s)

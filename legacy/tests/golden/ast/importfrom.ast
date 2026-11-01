@@ -1,0 +1,7 @@
+   0 Program          63   100 | body=1,3
+   1 ImportFrom       64    92 | path=2 alias=o
+   2 StringLit        77    86 | value=otro.src
+   3 Primitive        92   100 | name=PRINT args=4 inline=0
+   4 IntLit           98    99 | value=1
+
+; 5 nodo(s)

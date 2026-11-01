@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sourc</title>
+<style>
+  /* Los estilos van dentro y no en `styles.css`: ese llega con el modo PAGE de
+     la Fase 5, y un fichero vacío en la Fase 2 se descarga y no hace nada. */
+  body { background:#101018; color:#e8e8f0; margin:0; padding:2rem;
+         font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace }
+  h1 { font-size:1rem; letter-spacing:.1em; text-transform:uppercase;
+       color:#6a6a86; margin:0 0 1rem }
+  #estado { color:#6a6a86; margin:0 0 1rem }
+  #estado.error { color:#ff6a6a }
+  #salida { white-space:pre-wrap; word-break:break-word; margin:0; font:inherit }
+  /* El canvas de la Fase 3 va aquí. Commented, no vacío: un `<canvas>` sin
+     nada que lo pinte parecería implementado. */
+</style>
+</head>
+<body>
+<h1>Sourc</h1>
+<p id="estado">cargando…</p>
+<pre id="salida"></pre>
+
+<script type="module">
+// El pegamento es el mismo que usa `tools/host_node.mjs`, y también la
+// secuencia de carga: si divergieran, el bug sería de un lado y no del módulo.
+// Sólo cambia dónde acaba la salida.
+//
+// Esta página es la del repo. `sourc build --release` copia esta misma fuente
+// en `dist/` reescribiendo **sólo** el import del pegamento, que pasa a ser
+// `./glue_core.js` porque ahí los dos ficheros están al lado.
+import { ejecutar } from "../glue/glue_core.js";
+
+const $ = (id) => document.getElementById(id);
+const opciones = new URLSearchParams(location.search);
+const programa = opciones.get("p") || "main.wasm";
+
+// `fetch` + `ejecutar` y no `instantiateStreaming`: el segundo exige
+// `application/wasm`, y que la página no funcione por un MIME mal puesto es una
+// fragilidad que no compra nada.
+let host = null, error = null;
+try {
+  const respuesta = await fetch(programa);
+  if (!respuesta.ok) throw new Error(`${programa}: HTTP ${respuesta.status}`);
+  ({ host, error } = await ejecutar(await respuesta.arrayBuffer(),
+                                   { frames: Number(opciones.get("frames") || 1) }));
+} catch (fallo) {
+  // Un 404, una red caída o una trampa del módulo tienen que verse en la página:
+  // en blanco es indistinguible de un programa que no imprime nada.
+  error = fallo;
+}
+
+$("salida").textContent = host ? host.salida : "";
+$("estado").textContent = error ? `error: ${error.message}`
+  : `${programa} · ${host.frames} frame(s) · ${host.salida.length} bytes`;
+$("estado").classList.toggle("error", Boolean(error));
+
+// Un solo punto de lectura para el E2E por CDP y para la consola. Se lee de
+// aquí y no del DOM para no depender de cómo se presente el texto.
+window.sourcResultado = {
+  salida: host ? host.salida : "",
+  display: host ? host.display : [],
+  frames: host ? host.frames : 0,
+  error: error ? String(error.message) : null,
+};
+</script>
+</body>
+</html>

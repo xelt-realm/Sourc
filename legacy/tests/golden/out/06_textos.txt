@@ -1,0 +1,12 @@
+10
+10
+104
+hola
+mundo
+undo
+hola mundo!
+TRUE
+5
+43
+h
+2

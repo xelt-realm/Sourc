@@ -1,0 +1,31 @@
+' Arrays: literales, NEW, lectura, escritura y longitud.
+'
+' El tipo del elemento lo da el `AS`, no el literal: `ARRAY OF SINGLE = [1.5]`
+' reserva un array de SINGLE y no de DOUBLE, y el elemento se convierte. Es la
+' coerción que hace que `m[0]` valga lo que vale y no cero.
+
+DIM numeros AS ARRAY OF INTEGER = NEW INTEGER[4]
+numeros[0] = 10
+numeros[3] = 40
+PRINT numeros[0] + numeros[3]
+PRINT LEN(numeros)
+
+DIM mezclados AS ARRAY OF DOUBLE = NEW DOUBLE[2]
+mezclados[0] = 0.5
+PRINT mezclados
+
+' Un SINGLE de verdad: el literal no decide el tipo, lo decide el `AS`. Un
+' array de SINGLE ocupa la mitad que uno de DOUBLE y `m[0]` vale 1.5, no cero.
+DIM chicos AS ARRAY OF SINGLE = NEW SINGLE[2]
+chicos[0] = 1.5
+PRINT chicos
+
+DIM textos AS ARRAY OF STRING = ["uno", "dos"]
+PRINT textos[1]
+PRINT LEN(textos)
+
+' Un array del tamaño de una variable, que es como se reserva de verdad.
+DIM n AS INTEGER = 3
+DIM por_tamanio AS ARRAY OF INTEGER = NEW INTEGER[n]
+por_tamanio[n - 1] = 7
+PRINT por_tamanio[n - 1]

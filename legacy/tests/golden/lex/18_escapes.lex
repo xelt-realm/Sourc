@@ -1,0 +1,151 @@
+  56    57 newline       \n | \n
+  58    59 newline       \n | \n
+ 136   137 newline       \n | \n
+ 211   212 newline       \n | \n
+ 285   286 newline       \n | \n
+ 356   357 newline       \n | \n
+ 434   435 newline       \n | \n
+ 485   486 newline       \n | \n
+ 487   488 newline       \n | \n
+ 556   557 newline       \n | \n
+ 558   559 newline       \n | \n
+ 636   637 newline       \n | \n
+ 717   718 newline       \n | \n
+ 796   797 newline       \n | \n
+ 877   878 newline       \n | \n
+ 953   954 newline       \n | \n
+1012  1013 newline       \n | \n
+1048  1049 newline       \n | \n
+1049  1052 keyword       DIM | DIM
+1053  1059 ident         entero | entero
+1060  1062 keyword       AS | AS
+1063  1070 keyword       INTEGER | INTEGER
+1071  1072 op            = | =
+1073  1077 int           &HFF | &HFF
+1077  1078 newline       \n | \n
+1078  1081 keyword       DIM | DIM
+1082  1089 ident         binario | binario
+1090  1092 keyword       AS | AS
+1093  1100 keyword       INTEGER | INTEGER
+1101  1102 op            = | =
+1103  1109 int           &B1010 | &B1010
+1109  1110 newline       \n | \n
+1110  1113 keyword       DIM | DIM
+1114  1119 ident         octal | octal
+1120  1122 keyword       AS | AS
+1123  1130 keyword       INTEGER | INTEGER
+1131  1132 op            = | =
+1133  1137 int           &O17 | &O17
+1137  1138 newline       \n | \n
+1138  1141 keyword       DIM | DIM
+1142  1147 ident         mixto | mixto
+1148  1150 keyword       AS | AS
+1151  1158 keyword       INTEGER | INTEGER
+1159  1160 op            = | =
+1161  1165 int           &h10 | &h10
+1166  1167 op            + | +
+1168  1171 int           &b1 | &b1
+1172  1173 op            + | +
+1174  1177 int           &o1 | &o1
+1177  1178 newline       \n | \n
+1178  1181 keyword       DIM | DIM
+1182  1191 ident         exponente | exponente
+1192  1194 keyword       AS | AS
+1195  1201 keyword       SINGLE | SINGLE
+1202  1203 op            = | =
+1204  1209 float         1.5e3 | 1.5e3
+1209  1210 newline       \n | \n
+1210  1213 keyword       DIM | DIM
+1214  1218 ident         otro | otro
+1219  1221 keyword       AS | AS
+1222  1228 keyword       SINGLE | SINGLE
+1229  1230 op            = | =
+1231  1235 float         2E-2 | 2E-2
+1235  1236 newline       \n | \n
+1236  1239 keyword       DIM | DIM
+1240  1257 ident         enteroenexponente | enteroEnExponente
+1258  1260 keyword       AS | AS
+1261  1268 keyword       INTEGER | INTEGER
+1269  1270 op            = | =
+1271  1272 int           1 | 1
+1272  1273 newline       \n | \n
+1273  1276 keyword       DIM | DIM
+1277  1283 ident         cadena | cadena
+1284  1286 keyword       AS | AS
+1287  1293 keyword       STRING | STRING
+1294  1295 op            = | =
+1297  1325 string        con \n salto y \t tabulador | con \n salto y \t tabulador
+1325  1326 newline       \n | \n
+1326  1329 keyword       DIM | DIM
+1330  1337 ident         escapes | escapes
+1338  1340 keyword       AS | AS
+1341  1347 keyword       STRING | STRING
+1348  1349 op            = | =
+1351  1380 string        barra \\ y comilla " dentro | barra \\ y comilla " dentro
+1380  1381 newline       \n | \n
+1381  1384 keyword       DIM | DIM
+1385  1391 ident         llaves | llaves
+1392  1394 keyword       AS | AS
+1395  1401 keyword       STRING | STRING
+1402  1403 op            = | =
+1405  1428 string        llaves {y} literales | llaves {y} literales
+1428  1429 newline       \n | \n
+1429  1432 keyword       DIM | DIM
+1433  1444 ident         interpolada | interpolada
+1445  1447 keyword       AS | AS
+1448  1454 keyword       STRING | STRING
+1455  1456 op            = | =
+1458  1460 string        y  | y 
+1460  1461 op            { | {
+1461  1467 ident         entero | entero
+1467  1468 op            } | }
+1468  1483 string         sale en medio |  sale en medio
+1483  1484 newline       \n | \n
+1484  1489 keyword       PRINT | PRINT
+1490  1496 ident         entero | entero
+1496  1497 op            ; | ;
+1498  1505 ident         binario | binario
+1505  1506 op            ; | ;
+1507  1512 ident         octal | octal
+1512  1513 op            ; | ;
+1514  1519 ident         mixto | mixto
+1519  1520 newline       \n | \n
+1520  1525 keyword       PRINT | PRINT
+1526  1535 ident         exponente | exponente
+1535  1536 op            ; | ;
+1537  1541 ident         otro | otro
+1541  1542 op            ; | ;
+1543  1560 ident         enteroenexponente | enteroEnExponente
+1560  1561 newline       \n | \n
+1561  1566 keyword       PRINT | PRINT
+1568  1570 string        [ | [
+1570  1571 op            ; | ;
+1572  1578 ident         cadena | cadena
+1578  1579 op            ; | ;
+1581  1584 string        ][ | ][
+1584  1585 op            ; | ;
+1586  1593 ident         escapes | escapes
+1593  1594 op            ; | ;
+1596  1599 string        ][ | ][
+1599  1600 op            ; | ;
+1601  1607 ident         llaves | llaves
+1607  1608 op            ; | ;
+1610  1613 string        ][ | ][
+1613  1614 op            ; | ;
+1615  1626 ident         interpolada | interpolada
+1626  1627 op            ; | ;
+1629  1631 string        ] | ]
+1631  1632 newline       \n | \n
+1632  1635 keyword       DIM | DIM
+1636  1644 ident         remolque | remolque
+1645  1647 keyword       AS | AS
+1648  1655 keyword       INTEGER | INTEGER
+1656  1657 op            = | =
+1658  1659 int           4 | 4
+1659  1660 newline       \n | \n
+1716  1717 newline       \n | \n
+1717  1722 keyword       PRINT | PRINT
+1723  1731 ident         remolque | remolque
+1731  1731 eof            | 
+
+; 149 token(s)

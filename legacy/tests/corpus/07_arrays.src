@@ -1,0 +1,16 @@
+' Arrays: literales, NEW, lectura y escritura.
+DIM numeros AS ARRAY OF INTEGER = NEW INTEGER[5]
+FOR i = 0 TO 4
+    numeros[i] = i * i
+NEXT i
+PRINT numeros[0] ; " " ; numeros[1] ; " " ; numeros[2]
+PRINT numeros[3] ; " " ; numeros[4]
+PRINT LEN(numeros)
+
+DIM nombres AS ARRAY OF STRING = ["uno", "dos", "tres"]
+FOR i = 0 TO LEN(nombres) - 1
+    PRINT nombres[i]
+NEXT i
+
+DIM matriz AS ARRAY OF SINGLE = [1.5, 2.5, 3.5]
+PRINT STR(matriz[0] + matriz[2])

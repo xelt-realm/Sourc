@@ -1,0 +1,9 @@
+' GOSUB y GOTO son el mismo feature --salto no estructurado-- y los dos están
+' fuera. Se prueban por separado porque son nodos distintos del AST, y un
+' extractor que nombrara `salto` en vez de `goto`/`gosub` no podría prohibir uno
+' sin el otro.
+
+GOSUB volver
+PRINT 1
+vuelve:
+PRINT 2

@@ -1,0 +1,36 @@
+' Control de flujo completo, incluida la salida anticipada con bandera.
+'
+' Lo de la bandera es la nota importante: el lenguaje **no tiene** `EXIT` ni
+' `BREAK`, así que la forma de salir de un bucle es un booleano y un `IF`. Este
+' fixture existe para dejar eso escrito en un sitio que el gate lee, y para que
+' alguien que intente añadir `EXIT` vea que el gate lo prohibirá.
+
+DIM i AS INTEGER = 0
+WHILE i < 10
+  i = i + 1
+  IF i = 3 THEN
+    PRINT "tres"
+  ELSE IF i = 5 THEN
+    PRINT "cinco"
+  ELSE
+    PRINT i
+  END IF
+WEND
+
+FOR i = 0 TO 4 STEP 2
+  PRINT i
+NEXT
+
+' Salida anticipada: el bucle sigue dando vueltas, pero el `IF` ya no hace nada.
+DIM basta AS BOOLEAN = FALSE
+DIM vueltas AS INTEGER = 0
+FOR i = 0 TO 100
+  IF NOT basta THEN
+    IF i > 2 THEN
+      basta = TRUE
+      PRINT "salida en"; i
+    END IF
+  END IF
+  vueltas = vueltas + 1
+NEXT
+PRINT "vueltas"; vueltas

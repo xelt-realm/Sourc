@@ -1,0 +1,35 @@
+' Lo que el corpus no cubría y el lexador sí implementa.
+'
+' Existe por una razón concreta: el lexador escrito en Sourc se juzga con los
+' goldens de `sourc lex`, y si el corpus no usa un camino del lexador, ese
+' camino no está probado. Antes de este programa nadie comparaba &HFF, un
+' escape de salto de línea, un REM ni un exponente, y los cuatro están
+' implementados. Implementado y no probado es exactamente lo que se rompe sin
+' que nadie lo note hasta que lo necesita alguien.
+'
+' El orden de las líneas va en el del caso: cada bloque es una cosa.
+'
+' Y va "remolque" al final a propósito: REM sólo es comentario si no le sigue
+' un carácter de identificador, y el fallo más fácil de escribir es el contrario
+' --darle a REM el comentario siempre-- porque entonces "remolque" deja de ser
+' una variable. El docstring del lexador de Python dice además que REM tiene que
+' estar al principio de línea, y su código no lo comprueba. Este fichero no
+'Xvence: sigue al código, que es lo que los goldens miden.
+REM Este es un comentario completo.
+DIM entero AS INTEGER = &HFF
+DIM binario AS INTEGER = &B1010
+DIM octal AS INTEGER = &O17
+DIM mixto AS INTEGER = &h10 + &b1 + &o1
+DIM exponente AS SINGLE = 1.5e3
+DIM otro AS SINGLE = 2E-2
+DIM enteroEnExponente AS INTEGER = 1
+DIM cadena AS STRING = "con \n salto y \t tabulador"
+DIM escapes AS STRING = "barra \\ y comilla \" dentro"
+DIM llaves AS STRING = "llaves {{y}} literales"
+DIM interpolada AS STRING = "y {entero} sale en medio"
+PRINT entero; binario; octal; mixto
+PRINT exponente; otro; enteroEnExponente
+PRINT "["; cadena; "]["; escapes; "]["; llaves; "]["; interpolada; "]"
+DIM remolque AS INTEGER = 4
+REM esto es un comentario y no toca la variable de abajo
+PRINT remolque

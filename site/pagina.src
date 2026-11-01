@@ -1,0 +1,184 @@
+' La página del proyecto, programada en Source.
+'
+' Esto no es un fichero de texto con markup: es un programa que **calcula** el
+' documento. La diferencia se ve en las reglas del propio lenguaje.
+'
+' ---- lo que este programa no puede hacer, y por qué
+'
+' 1. **Una llave.** `{` abre interpolación dentro de un literal, así que el CSS
+'    no puede salir de aquí. Vive en `site/styles.css`, y `budgets.toml` ya lo
+'    proyectaba para la Fase 5. Hay una puerta que lo comprueba: el markup de
+'    este programa no puede contener un `{`.
+'
+' 2. **Un salto de línea dentro de un literal.** El lexer da `E0003` en un `\n`
+'    dentro de un texto. Por eso el idiom de aquí es `PRINT a, b, c`, que pone
+'    **una línea por elemento**; es la forma natural de escribir un documento en
+'    este lenguaje, no un truco.
+'
+' 3. **Tocar un global desde una FUNCTION.** `E0067`: en WASM cada función tiene
+'    sus propios locales, así que un global no se puede compartir. Todas las
+'    funciones de aquí reciben lo que necesitan por parámetro, y para un
+'    generador de páginas eso es mejor diseño y no una molestia.
+'
+' 4. **Leer ficheros.** El contenido es el programa. Lo que hay en esta página es
+'    lo que hay aquí abajo, y `tests/test_sitio.py` comprueba que las cifras que
+'    dice sean las de verdad.
+
+' ---- la prosa
+'
+' El sitio es una frase sobre el lenguaje, su instalación, un ejemplo que se
+' puede copiar, el estado real del proyecto y el camino que queda. Nada más:
+' lo justo para poder seguir implementando, no un tutorial. El tutorial es un
+' documento aparte y sigue sin existir, como exige el Definition of Done.
+
+' ---- por qué las sentencias son largas
+'
+' Esta lengua **no tiene continuación de línea**. Ni `_` al final ni nada: una
+' sentencia es una línea, y partirla da `E0010`. Es una restricción real y
+' agobiante a primera vista, así que aquí está escrita: las líneas de este
+' programa son largas porque el lenguaje no da otra cosa.
+'
+' La contrapartida buena es que no hay puntos donde un concatenado se parte por
+' error y produce un documento distinto en silencio. Una línea es una
+' sentencia, y una sentencia es una idea.
+'
+' ---- las cifras
+'
+' Van en el programa y hay una puerta que las contrasta con el repo. Una página
+' que dice "459 tests" y un día hay 460 es una página que miente, y una puerta
+' que no se entera de eso no es una puerta.
+
+DIM TESTS AS INTEGER = 497
+DIM PUERTAS AS INTEGER = 18
+DIM CORPUS AS INTEGER = 18
+DIM PARIDAD AS INTEGER = 20
+DIM DIAGNOSTICOS AS INTEGER = 50
+DIM PYZ AS INTEGER = 179
+DIM PEGAMENTO AS INTEGER = 2851
+
+
+' ------------------------------------------------------------- utilidades
+
+' Una sección con título. Los atributos van con comilla simple porque dentro de
+' un literal delimitado por dobles la doble需要对 el escapado `\"`, y el simple
+' va suelto. Es un detalle de legibilidad del fuente, no del documento.
+FUNCTION seccion(titulo AS STRING, cuerpo AS STRING) AS STRING
+  RETURN "<section class=\"seccion\">" &          "<h2>" & titulo & "</h2>" &          cuerpo &          "</section>"
+END FUNCTION
+
+
+' Una lista de `<li>`. El bucle es sobre un ARRAY OF STRING, así que el
+' contenido son datos y no código: es lo que hace que añadir un punto sea
+' escribir una línea y nada más.
+FUNCTION lista(items AS ARRAY OF STRING) AS STRING
+  DIM out AS STRING = "<ul>"
+  DIM i AS INTEGER = 0
+  WHILE i < LEN(items)
+    out = out & "<li>" & items[i] & "</li>"
+    i = i + 1
+  WEND
+  RETURN out & "</ul>"
+END FUNCTION
+
+
+' Una tabla de `n` columnas. Recibe las celdas **planas** y pone los `<td>` ella, porque pasar filas ya formateadas significaba anidar `<td>` dentro de `<td>`, que es HTML inválido. Se vio al mirar el documento, no en un test: el navegador lo tolera y el documento queda mal.
+FUNCTION tabla(cabeceras AS ARRAY OF STRING, celdas AS ARRAY OF STRING) AS STRING
+  DIM columnas AS INTEGER = LEN(cabeceras)
+  DIM out AS STRING = "<table><thead><tr>"
+  DIM i AS INTEGER = 0
+  WHILE i < columnas
+    out = out & "<th>" & cabeceras[i] & "</th>"
+    i = i + 1
+  WEND
+  out = out & "</tr></thead><tbody>"
+  i = 0
+  WHILE i < LEN(celdas)
+    out = out & "<tr>"
+    DIM j AS INTEGER = 0
+    WHILE j < columnas
+      out = out & "<td>" & celdas[i + j] & "</td>"
+      j = j + 1
+    WEND
+    out = out & "</tr>"
+    i = i + columnas
+  WEND
+  RETURN out & "</tbody></table>"
+END FUNCTION
+
+
+' Una cifra con su unidad, para que los números de estado se lean solos.
+FUNCTION medida(valor AS INTEGER, unidad AS STRING) AS STRING
+  RETURN "<span class=\"cifra\">" & STR(valor) & "</span> " & unidad
+END FUNCTION
+
+
+' ------------------------------------------------------------- el documento
+
+DIM promesas AS ARRAY OF STRING = ["<b>Predecible.</b> El mismo código produce el mismo binario, y el mismo " &   "binario el mismo comportamiento.",   "<b>Pequeño.</b> Hay un presupuesto por artefacto, verificado en CI. Si un " &   "cambio lo rompe, el build falla. No es un informe: es una puerta.",   "<b>Explícito.</b> Los tipos se resuelven en compilación. Si un tipo no se " &   "puede resolver, es un error con sugerencia, nunca una sorpresa.",   "<b>Sin recolector obligatorio.</b> Las arenas tienen ámbito, y la regla es " &   "cero asignaciones por frame, verificada con un contador.",   "<b>Auditable.</b> El pegamento completo cabe en " & STR(PEGAMENTO) & " B " &   "gzip. El runtime se escribe en el mismo lenguaje que el usuario.",   "<b>Portable.</b> Un <code>.src</code> es un proyecto. El resultado es un " &   "directorio estático que se sirve desde cualquier sitio."]
+
+DIM no_go AS ARRAY OF STRING = ["Virtual DOM, reconciliación e hydration.",   "Frameworks de terceros en el resultado.",   "Gestor de paquetes: no hay <code>node_modules</code> en el proyecto de un " &   "usuario.",   "FFI dinámico en runtime: los límites con el host son explícitos y " &   "versionados.",   "Metaprogramación en runtime. Las macros, si algún día existen, son de " &   "compilación.",   "Recolector de basura como requisito.",   "<code>GOTO</code> sin aviso: existe, y marca el código como legado.",   "Editor o IDE. Hay LSP, coloración y un formateador. Nada más.",   "Motor 3D completo."]
+
+DIM fases AS ARRAY OF STRING = [ "Fase 0 · Documentos y decisiones", "completada", "Fase 1 · Frontend en Python", "completa", "Fase 2 · Backend WASM y pipeline", "casi completa: falta el E2E en un Chromium de verdad", "Fase 3 · Gráficos 2D", "pendiente", "Fase 4 · Tipos avanzados y arenas", "pendiente, y ya no bloquea al compilador", "Fase 5 · Modo PAGE", "pendiente", "Fase 6 · Backend JS", "pendiente", "Fase 7 · 3D y glTF", "pendiente", "Fase 8 · Auto-hospedaje", "empezada: el lexer entero y el parser con sus cuerpos, en Sourc" ]
+
+
+
+' Las filas de la tabla de fases llegan como texto ya con las celdas puestas,
+' porque una celda es HTML y una celda es texto y Source no tiene un tipo que
+' sea "cualquier cosa de estos dos". La tabla se arma con `<td>` alrededor.
+PRINT "<!doctype html>"
+PRINT "<html lang=\"es\">"
+PRINT "<head>"
+PRINT "<meta charset=\"utf-8\">"
+PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+PRINT "<title>Sourc — BASIC moderno que compila a WebAssembly</title>"
+PRINT "<meta name=\"description\" content=\"Un lenguaje compilado a " &       "WebAssembly, con sintaxis BASIC moderna, sin dependencias y con el " &       "peso como puerta de build.\">"
+PRINT "</head>"
+PRINT "<body>"
+PRINT "<div class=\"envoltorio\">"
+
+PRINT "<header class=\"cabecera\">"
+PRINT "<p class=\"marca\">lenguaje de programación</p>"
+PRINT "<h1 class=\"titulo\">Sourc</h1>"
+PRINT "<p class=\"subtitulo\">BASIC moderno que compila a WebAssembly. Un " &       "<code>.src</code> son cuatro ficheros que se sirven desde cualquier " &       "sitio.</p>"
+PRINT "</header>"
+
+PRINT "<main>"
+
+' ---- la idea
+PRINT seccion("La idea",   "<p>El coste se paga una vez, en la compilación. El usuario lo paga cero " &   "veces, en cada visita.</p>" &   "<p class=\"nota\">Todo el trabajo pesado ocurre en build time. Quien llega " &   "recibe un binario pequeño y predecible: sin frameworks, sin virtual DOM, " &   "sin hydration, sin gestor de paquetes.</p>")
+
+' ---- para quién
+PRINT seccion("Para quién",   "<p>Para quien viene de QBasic o de BASIC moderno y quiere algo que " &   "funcione en el navegador hoy, sin aprender un ecosistema de cinco " &   "herramientas ni montar un <code>node_modules</code> antes de escribir la " &   "primera línea.</p>")
+
+' ---- promesas
+PRINT seccion("Qué prometemos", lista(promesas))
+
+' ---- no-goals
+PRINT seccion("Qué no hacemos",   "<p class=\"nota\">Esta lista es normativa. Añadir algo aquí requiere un " &   "ADR.</p>" & lista(no_go))
+
+' ---- un ejemplo
+PRINT seccion("Un ejemplo", "<pre><code>DIM total AS INTEGER = 7\nDIM medio AS DOUBLE = 0.0\nDIM i AS INTEGER = 1\nWHILE i <= total\n  medio = medio + i\n  i = i + 1\nWEND\nPRINT total / 2\nPRINT -9 \\ 2\nPRINT STR(medio / total)</code></pre><p class=\"nota\">Y lo que produce, con el intérprete y con el módulo, idéntico:</p><pre><code>3.5\n-4\n4</code></pre><p>La primera línea es 3.5 y no 3 porque <code>/</code> es división real y <code>\\</code> es la entera. La segunda es la que importa: <code>\\</code> trunca hacia cero y <code>DIV</code> hacia menos infinito, y no es lo mismo. El backend delegaba una en la otra y ningún test lo veía porque el corpus sólo dividía números positivos. Lo encontró el fuzzer diferencial, comparando las dos salidas de un programa que dividía un negativo sin haberlo planeado.</p>")
+
+' ---- instalar
+PRINT seccion("Cómo se instala",   "<p>Hoy no hace falta instalar nada del compilador si no quieres:</p>" &   "<pre><code>git clone https://example.invalid/sourc\ncd sourc\nmake hola</code></pre>" &   "<p>O con un solo fichero, sin clonar el repositorio:</p>" &   "<pre><code>python3 sourc.pyz run mi_programa.src</code></pre>" &   "<p class=\"nota\">El fichero pesa " & STR(PYZ) & " KB y hace falta Python " &   "3.11 o superior. Todavía hace falta Python porque el compilador todavía " &   "es Python, y eso no es instalar el compilador: es que la semilla de la " &   "cadena de confianza es el propio lenguaje. El lexer y el parser ya están " &   "escritos en Sourc, así que el final de esto ya no es una pregunta de si se " &   "puede, sino de cuánto falta.</p>")
+' ---- la filosofía
+PRINT seccion("Cómo se sostiene",   "<p class=\"nota\">Lo de arriba es lo que el lenguaje promete. Esto es lo no " &   "obvio: cómo se evita que las promesas se queden en palabras.</p>" &   "<table><thead><tr><th>Regla</th><th>Por qué existe</th></tr></thead><tbody>" &   "<tr><td>Puerta, no informe</td><td>Un presupuesto que sólo informa no " &   "aprieta nada. Si no cabe, el build falla y el artefacto no se escribe.</td>" &   "</tr>" &   "<tr><td>Ratchet, no tolerancia</td><td>Un <code>--tolerate 3</code> no sabe " &   "cuáles son ni por qué. En dos meses nadie lo recuerda.</td></tr>" &   "<tr><td>Oráculo independiente</td><td>Cinco de los bugs más caros los " &   "encontró una segunda implementación de la misma especificación. Un módulo " &   "que valida puede calcular otra cosa.</td></tr>" &   "<tr><td>Medir donde vive la feature</td><td><code>call.native</code> es una " &   "operación que escondía veintitrés funciones. La puerta estaba verde " &   "mientras cuatro no compilaban.</td></tr>" &   "<tr><td>Un diagnóstico que se cae no es un diagnóstico</td><td>Código, " &   "posición, corrección y sugerencia. Y probarlo ejecutándolo, porque existir " &   "en el fichero no prueba que su camino funcione.</td></tr>" &   "<tr><td>El presupuesto manda sobre la comodidad</td><td>Subir un techo " &   "tres veces en un día es dejar de notar regresiones. Lo que no cabía se fue " &   "a otro programa.</td></tr>" &   "</tbody></table>")
+
+' ---- el estado real
+PRINT seccion("El estado, medido",   "<p>Esto no es una promesa, es lo que hay hoy. Y hay una puerta que " &   "comprueba que estas cifras siguen siendo verdad.</p>" &   "<p>" & medida(TESTS, "tests en verde") & ", " &   medida(PUERTAS, "puertas antes de etiquetar") & ", " &   medida(CORPUS, "programas en el corpus") & ", " &   medida(PARIDAD, "con paridad Stage 0 ↔ Stage 1") & " y " &   medida(DIAGNOSTICOS, "códigos de diagnóstico") & ".</p>" &   tabla(["Fase", "Estado"], fases) &   "<p class=\"aviso\">El camino crítico es el compilador escrito en Source, y ya no son las arenas. " &   "La suposición de que la Fase 4 lo bloqueaba era falsa: el módulo <strong>ya</strong> cruza puntero y " &   "longitud al host, y un módulo WASM se entrega en memoria, así que no hace falta escribir ficheros. " &   "Quedaba un hueco --Source no tenía forma de construir un byte, y sin eso no se puede emitir un binario-- " &   "y ya está cerrado con <code>CHR</code> (ADR 0021).</p>")
+
+' ---- el camino
+PRINT seccion("El camino que queda",   lista(["<b>El compilador en Source</b> · el lexer y el parser ya están " &     "escritos en Sourc y juzgados byte a byte contra los de Python. Falta el typechecker, el lowering y el " &     "emisor. Cuando termine, <code>sourc.wasm</code> compila en el navegador y no hace falta nada instalado: " &     "ni Python ni un compilador nativo.",     "<b>Fase 8</b> · el camino crítico. Python sale del camino crítico del desarrollador, no del proyecto.",     "<b>Fase 4</b> · arenas y tipos avanzados. Ya no bloquean al compilador; bloquearían a un runtime escrito " &     "en Source con memoria compartida.",     "<b>Fase 3</b> · gráficos 2D. Da un demo visible y cierra un presupuesto que hoy dice que no se pudo medir.",     "<b>Fase 5</b> · modo PAGE. Esta página es su precursor: calcula un documento entero desde Source."]))
+
+' ---- sobre esta página
+PRINT seccion("Sobre esta página",   "<p>El documento que estás leyendo lo calcula un programa Source de " &   "verdad: <code>site/pagina.src</code>. No hay plantillas ni " &   "sustituciones.</p>" &   "<p class=\"nota\">Ese programa no puede emitir una llave " &   "—<code>&lbrace;</code> abre interpolación—, así que los estilos viven en " &   "<code>site/styles.css</code>. Y hay dos puertas sobre esa hoja: que no " &   "haya un <code>border-radius</code> que no sea <code>0</code>, y que el " &   "modo oscuro no se invierta con <code>prefers-color-scheme</code>.</p>")
+
+PRINT "</main>"
+
+PRINT "<footer class=\"pie\">"
+PRINT "<p>Sourc · licencia MIT · el compilador es Python y no tiene " &       "dependencias externas, a propósito: tiene que poder compilarse a sí " &       "mismo sin nada instalado.</p>"
+PRINT "</footer>"
+
+PRINT "</div>"
+PRINT "</body>"
+PRINT "</html>"

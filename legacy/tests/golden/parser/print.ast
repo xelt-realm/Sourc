@@ -1,0 +1,15 @@
+   0 Program          59   121 | body=1,4,7,9
+   1 Primitive        60    79 | name=PRINT args=2,3 inline=0
+   2 StringLit        67    71 | value=uno
+   3 StringLit        74    78 | value=dos
+   4 Primitive        79    94 | name=PRINT args=5,6 inline=1
+   5 StringLit        86    88 | value=a
+   6 StringLit        91    93 | value=b
+   7 Primitive        94   104 | name=PRINT args=8 inline=0
+   8 StringLit       101   103 | value=c
+   9 Primitive       104   121 | name=PRINT args=10,11,12 inline=1
+  10 IntLit          110   111 | value=1
+  11 IntLit          113   114 | value=2
+  12 BoolLit         116   120 | value=1
+
+; 13 nodo(s)

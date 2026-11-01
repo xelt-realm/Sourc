@@ -1,0 +1,5 @@
+42
+610
+hola mundo
+  [aviso]
+10

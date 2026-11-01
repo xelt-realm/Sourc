@@ -1,0 +1,31 @@
+' El laberinto sin dibujo: el bucle que dibuja, reducido a contar celdas.
+' Sirve para fijar la semántica del bucle de juego con muchas iteraciones.
+USE SOURCE_2D
+
+DIM mapa AS ARRAY OF STRING = [
+    "################",
+    "#..............#",
+    "#.####.#####.#.#",
+    "#.#..#.#...#.#.#",
+    "#.#.##.#.#.#.#.#",
+    "#.#....#.#...#.#",
+    "#.######.#####.#",
+    "#..............#",
+    "################"
+]
+
+DIM celdas AS INTEGER = 0
+DIM frames AS INTEGER = 0
+
+WHILE frames < 5
+    FOR fila = 0 TO LEN(mapa) - 1
+        FOR col = 0 TO LEN(mapa[fila]) - 1
+            IF mapa[fila][col] = "#" THEN celdas = celdas + 1
+        NEXT col
+    NEXT fila
+    frames = frames + 1
+    FLIP
+WEND
+
+PRINT "frames: " & STR(frames)
+PRINT "paredes vistas: " & STR(celdas)

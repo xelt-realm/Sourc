@@ -1,0 +1,85 @@
+{
+  "programas": {
+    "01_hola.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "41d85e0b52944ee2"
+    },
+    "02_tipos.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "d3f4dac28595768e"
+    },
+    "03_aritmetica.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "4157559c8ec45c95"
+    },
+    "04_controles.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "c048f5be6baccb69"
+    },
+    "05_funciones.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "ba1fa6be649be3cf"
+    },
+    "06_textos.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "b85e9cc00aea1e8e"
+    },
+    "07_arrays.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "915042a980b2475e"
+    },
+    "08_interpolacion.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "3485e51ec31d6dac"
+    },
+    "09_boolenos.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "1a42e853fd8d3a3a"
+    },
+    "10_presupuesto.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "c20063f71abdadfe"
+    },
+    "11_laberinto.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "e3b0c44298fc1c14"
+    },
+    "12_juego.src": {
+      "display": "6aa2578b39a88789",
+      "salida": "e3b0c44298fc1c14"
+    },
+    "13_recursividad.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "4b569803cdede10a"
+    },
+    "14_matrices.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "b084bb84ed1202f3"
+    },
+    "15_operaciones.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "bc309c33ec652098"
+    },
+    "16_nativas.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "483b11d2c90332b6"
+    },
+    "17_truncamiento.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "a1d2e2dbb0b964a1"
+    },
+    "18_escapes.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "34ac1c4aaf04d40e"
+    },
+    "hola.src": {
+      "display": "e3b0c44298fc1c14",
+      "salida": "41d85e0b52944ee2"
+    },
+    "laberinto.src": {
+      "display": "6ff0c0f6c05ee005",
+      "salida": "e3b0c44298fc1c14"
+    }
+  },
+  "version": 1
+}

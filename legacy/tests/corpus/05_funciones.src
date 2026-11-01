@@ -1,0 +1,23 @@
+' Funciones, recursión y llamada sin usar el resultado.
+FUNCTION doble(x AS INTEGER) AS INTEGER
+    RETURN x * 2
+END FUNCTION
+
+FUNCTION fib(n AS INTEGER) AS INTEGER
+    IF n < 2 THEN RETURN n
+    RETURN fib(n - 1) + fib(n - 2)
+END FUNCTION
+
+FUNCTION saluda(nombre AS STRING) AS STRING
+    RETURN "hola " & nombre
+END FUNCTION
+
+FUNCTION avisa() AS VOID
+    PRINT "  [aviso]"
+END FUNCTION
+
+PRINT doble(21)
+PRINT fib(15)
+PRINT saluda("mundo")
+avisa()
+PRINT STR(LEN(saluda("mundo")))

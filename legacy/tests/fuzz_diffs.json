@@ -1,0 +1,6 @@
+{
+  "diferencias": {
+    "779000": "El intérprete produce 6751 líneas y el módulo 3891: el módulo termina entre dos elementos de un PRINT, después de 3890 líneas idénticas.\n\nDescartado, con comprobación: los bucles anidados por sí solos coinciden (un WHILE con un FOR y un WHILE dentro da 126 líneas en los dos lados); `FOR ... STEP 2` coincide; no hay `FLIP` en el programa, así que no es el límite de frames; y el módulo sale con código 0, así que no es una trampa.\n\nLo que queda por mirar: algún bucle sale antes en el módulo. Los contadores de los WHILE son `i = i + 1` y no se reescriben, así que la diferencia tiene que estar en el valor de la condición en alguna de las vueltas -- quizá en la comparación de un SINGLE que se promociona, que es justo el tipo de cosa que el arreglo de `eq.f64` tocó.\n\nCómo reproducir: python3 tools/fuzz_source.py --ver 0 --semilla 779000"
+  },
+  "version": 1
+}

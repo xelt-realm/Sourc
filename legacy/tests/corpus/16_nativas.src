@@ -1,0 +1,77 @@
+' ABS, MIN, MAX y CLAMP: las cuatro que la lengua declaraba sin nadie.
+'
+' Este programa existe por una puerta, no por una idea. `tests/
+' test_cobertura_features.py` mide la cobertura por **feature** y no por
+' operación del IR, y el día que se escribió dio siete funciones nativas sin
+' demostrar: `ABS`, `MIN`, `MAX`, `CLAMP`, `SIN`, `COS` y `KEYDOWN`. Cuatro de
+' esas siete eran las que el backend no bajaba.
+'
+' El hueco era invisible para el tripwire, que mide operaciones del IR, porque
+' `call.native` es **una** operación que ya estaba ejercitada por `RGB`. Una
+' operación escondía veintitrés features y la puerta veía una.
+'
+' Con este archivo, `ABS` pasó de "declarada" a "demostrada", y el programa que
+' la usa vive aquí y no en `15_operaciones.src` a propósito: un archivo por
+' bloque de features hace que el diff diga qué cambió sin tener que leer dos
+' veces, y mantiene cada techo de peso por debajo de donde se.opone.
+'
+' No hay aqui nada de dibujo ni de entrada: son de la Fase 3 y están reservadas con
+' motivo en la puerta.
+
+' ---- enteros: aquí no hay instrucción y se sintetiza
+'
+' WASM tiene `f64.abs`, `f64.min` y `f64.max`, y **no tiene** `i64.abs`, ni
+' `i64.min`, ni `i64.max`. De los tres, en el MVP sólo existen las versiones de
+' flotante. El backend monta el caso entero con `select`, que son cinco
+' instrucciones y un comentario, frente a las ocho y el acertijo de la
+' fórmula con `xor` y desplazamiento.
+'
+' Y el orden de los dos valores de `select` importa: `select` devuelve el
+' **primer** valor cuando la condición no es cero, y si se invierte da un
+' módulo que valida, que Node ejecuta y que devuelve el número equivocado.
+DIM negativo AS INTEGER = -5
+DIM positivo AS INTEGER = 3
+
+PRINT ABS(negativo)
+PRINT ABS(positivo)
+PRINT ABS(0)
+PRINT ABS(-2.5)
+
+' ---- min y max con argumentos de tipos distintos
+'
+' `MAX(1, 3.5)` declara DOUBLE y no INTEGER: comparar entre sí obliga a
+' promocioar al tipo más ancho de los que llegan, y declarar el del primero
+' obligaba a estrechar en silencio.
+PRINT MIN(positivo, negativo)
+PRINT MAX(positivo, negativo)
+PRINT MIN(1.5, 2)
+PRINT MAX(1, 3.5)
+
+' ---- clamp: max(low, min(value, high))
+'
+' El `min` interno se calcula dos veces porque hacen falta dos copias, una para
+' el valor y otra para la comparación, y `select` se come sus tres operandos
+' sin dejar nada en la pila.
+PRINT CLAMP(1, positivo, 9)
+PRINT CLAMP(5, 1, 3)
+PRINT CLAMP(1, 2.5, 3)
+
+' ---- el borde que separa IEEE de comparar bits
+'
+' `0.0` y `-0.0` son el mismo número y **distintos bits**. El `eq` sin sufijo
+' elegía opcode mirando el destino, que es BOOLEAN y por tanto siempre i32,
+' así que comparaba dos `f64` con `i64.eq`. Eso da la respuesta correcta casi
+' siempre y la incorrecta justo aquí.
+PRINT (0.0 = -0.0)
+PRINT (-0.0 <> 0.0)
+
+' ---- construir un byte: el otro lado de CHARCODE (ADR 0021)
+'
+' `CHR` es lo que permite que un programa en Source escriba un binario, y por
+' lo tanto lo que permite que exista un compilador sin Python. El rango es de
+' 0 a 255 porque una cadena aqui son bytes: `LEN(CHR(233))` es 1, no 2.
+PRINT CHR(65)
+PRINT CHR(10)
+PRINT LEN(CHR(233))
+PRINT CHARCODE(CHR(65), 0)
+PRINT LEN(CHR(0))

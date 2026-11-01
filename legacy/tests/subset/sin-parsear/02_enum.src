@@ -1,0 +1,7 @@
+' ENUM, como STRUCT: llega en la Fase 4 y hoy no parsea.
+
+ENUM color
+  ROJO
+  VERDE
+  AZUL
+END ENUM
